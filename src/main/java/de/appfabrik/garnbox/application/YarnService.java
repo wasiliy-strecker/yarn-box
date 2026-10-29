@@ -36,7 +36,7 @@ public final class YarnService {
 
   public static List<Yarn> search(List<Yarn> yarns, String query) {
     String needle = normalize(query == null ? "" : query.strip());
-    Collator collator = Collator.getInstance(Locale.GERMAN);
+    Collator collator = Collator.getInstance(Locale.getDefault());
     collator.setStrength(Collator.SECONDARY);
     return yarns.stream()
         .filter(yarn -> matches(yarn, needle))

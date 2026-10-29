@@ -64,6 +64,19 @@ erhalten. Während Bildprüfung und Speichern wartet der Dialog auf den Abschlus
 | Enter im Notizfeld | Neue Zeile |
 | Tab / Umschalt+Tab | Steuerelemente wechseln |
 
+## Sprachen und Store-Vorschau
+
+Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch
+und Portugiesisch (Brasilien) verfügbar. Über „Sprache“ eine feste Sprache oder
+die Systemsprache wählen und GarnBox neu starten. Die Wahl steht in
+`language.txt` im Datenordner. Garne und Fotos bleiben dabei unverändert.
+Nicht unterstützte Sprachen verwenden Englisch.
+
+Die [Internationalisierungsanleitung](docs/internationalization.md) beschreibt
+die sechs Store-Textfassungen, eigene Icons und 24 echte Linux-Vorschau-Bilder.
+Die Lieferung erfolgt als Ordner ohne ZIP. Die native Windows-Abnahme folgt
+separat. Die Dateiauswahl verwendet teilweise Beschriftungen des Betriebssystems.
+
 ## Daten und Tests
 
 App-Kennung: `de.appfabrik.garnbox`. Die Datei `garnbox.db` enthält Texte und Fotos.

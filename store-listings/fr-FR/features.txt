@@ -1,0 +1,5 @@
+Gérez les noms, marques, couleurs, emplacements et notes
+Une photo JPEG ou PNG facultative par fiche
+Recherche dans les cinq champs de texte
+Stockage local sans compte
+Six langues d’interface au choix

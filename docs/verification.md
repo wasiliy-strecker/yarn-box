@@ -1,6 +1,50 @@
 # Prüfbericht
 
-Stand: 26. Oktober 2026, GarnBox 0.1.0.
+Stand: 29. Oktober 2026, GarnBox 0.1.0.
+
+## Internationalisierung am 29. Oktober 2026
+
+69 JUnit-Testfälle bestehen, einschließlich 25 zusätzlicher Prüfungen für
+Sprachkataloge und Einstellungen. Alle sechs Kataloge enthalten dieselben
+91 Schlüssel. Platzhalter, Singular und Plural, regionale Zahlengruppierung,
+Apostrophe und Akzente, Systemsprachvarianten und englischer Fallback sind
+geprüft. Eine Spracheinstellung darf die bestehende Datenbank, Texte und
+Foto-Bytes nicht verändern. Fehlende, unbekannte, übergroße und beschädigte
+Einstellungen sowie fehlgeschlagener Dateiaustausch sind berücksichtigt.
+
+Formatter, Compiler-Lint mit `-Werror`, Enforcer und SpotBugs bestehen.
+Die Python-Helfer bestehen Ruff-Prüfung und Formatkontrolle. Die Shell-Skripte
+bestehen `bash -n`. Die Versionsnummer bleibt 0.1.0, es ist kein Store-Upload.
+
+Je Sprache wurden drei echte JavaFX-Prozesse auf einem eigenen Xvfb-Bildschirm
+gestartet. Die 18 erfolgreichen Abläufe prüfen lokalisierte Oberfläche und
+Fehler, Unicode-Suche, lange Notizen, PNG-/JPEG-Import über den nativen Dialog,
+abgelehnte ungültige Bilder, Fotoersatz, Entfernen und Verwerfen, SQLite-Sperre
+mit erneutem Speichern, sicheres Abbrechen des Löschens, Einstellungen mit
+Schreibfehler und einen neuen Prozess nach Sprachwechsel. Bildbytes und Textdaten
+werden zusätzlich direkt aus SQLite gelesen und verglichen.
+
+Hauptfenster mit 860 × 700 und Editor mit 660 × 540 Pixeln wurden geprüft.
+Fehlerhinweise umbrechen und die Aktionen bleiben erreichbar. Der Editor
+scrollt die längeren Inhalte. Die 24 unveränderten Bildschirmaufnahmen der
+produktiven App zeigen ausschließlich synthetische Texte und eigene gezeichnete
+Garnmotive. Übersicht, Fotodialog, Suche und Sprachwahl wurden visuell geprüft.
+
+Das aktuelle Linux-App-Image startet mit eigener JVM außerhalb des Projekts,
+ohne `JAVA_HOME` und mit `PATH=/nonexistent`. Der Test umfasst 1234 vorhandene
+Einträge, französische Zahlengruppierung, Unicode-Änderung, nativen JPEG-Import,
+Sprachwechsel über die Oberfläche und englischen Neustart. Nach Löschen der
+Bildquelle bleibt die gespeicherte Fotovorschau erhalten. Die geladenen
+JVM-Bibliotheken und die unveränderte Paketlaufzeit wurden kontrolliert.
+
+Nachweise liegen in `target/gui-international-final` und
+`target/packaged-international-final`. Die endgültige Lieferung übernimmt sie
+in `Verification` und ergänzt den geprüften Quellcommit sowie SHA-256-Werte.
+Sie wird als Ordner ohne ZIP geliefert. Befehle, Voraussetzungen und Grenzen
+stehen in [internationalization.md](internationalization.md).
+
+Die folgenden Abschnitte dokumentieren zusätzlich die ursprüngliche deutsche
+Abnahme vom 26. Oktober 2026.
 
 ## Automatische Prüfungen
 
@@ -14,7 +58,7 @@ bash -n scripts/run.sh scripts/package.sh
 git diff --cached --check
 ```
 
-44 JUnit-Testfälle bestanden. Compiler-Lint mit `-Werror`, Maven Enforcer,
+Bei der ursprünglichen Abnahme bestanden 44 JUnit-Testfälle. Compiler-Lint mit `-Werror`, Maven Enforcer,
 Spotless und SpotBugs bestanden ohne Befunde.
 
 | Bereich | Geprüft |

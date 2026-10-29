@@ -5,6 +5,7 @@ import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Photo;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.domain.YarnDraft;
+import de.appfabrik.garnbox.i18n.Messages;
 import java.io.File;
 import java.util.function.Consumer;
 import javafx.application.Platform;
@@ -30,6 +31,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 final class YarnEditor {
+  private final Messages messages;
   private final Stage stage = new Stage();
   private final TextField name = new TextField();
   private final TextField brand = new TextField();
@@ -39,11 +41,11 @@ final class YarnEditor {
   private final Label validation = new Label();
   private final Label error = new Label();
   private final Label progress = new Label();
-  private final Button save = new Button("Speichern");
-  private final Button cancel = new Button("Abbrechen");
-  private final Button choose = new Button("Foto auswählen …");
-  private final Button remove = new Button("Foto entfernen");
-  private final PhotoPreview preview = new PhotoPreview(232, 170);
+  private final Button save = new Button();
+  private final Button cancel = new Button();
+  private final Button choose = new Button();
+  private final Button remove = new Button();
+  private final PhotoPreview preview;
   private final YarnService service;
   private final AsyncTasks tasks;
   private final Long id;
@@ -58,7 +60,15 @@ final class YarnEditor {
       Photo existingPhoto,
       YarnService service,
       AsyncTasks tasks,
-      Consumer<Yarn> onSaved) {
+      Consumer<Yarn> onSaved,
+      Messages messages) {
+    this.messages = messages;
+    preview = new PhotoPreview(232, 170, messages);
+    preview.setId("editor-photo");
+    save.setText(messages.text("action.save"));
+    cancel.setText(messages.text("action.cancel"));
+    choose.setText(messages.text("photo.choose"));
+    remove.setText(messages.text("photo.remove"));
     this.service = service;
     this.tasks = tasks;
     this.onSaved = onSaved;
@@ -74,23 +84,32 @@ final class YarnEditor {
     original = input();
     stage.initOwner(owner);
     stage.initModality(Modality.WINDOW_MODAL);
-    stage.setTitle(existing == null ? "Garn hinzufügen" : "Garn bearbeiten");
+    stage.setTitle(existing == null ? messages.text("yarn.add") : messages.text("yarn.edit"));
     stage.setMinWidth(660);
     stage.setMinHeight(540);
     Label heading = new Label(stage.getTitle());
     heading.getStyleClass().add("section-heading");
-    Label hint = new Label("Nur die Bezeichnung ist erforderlich.");
+    Label hint = new Label(messages.text("editor.hint"));
     hint.getStyleClass().add("muted");
+    hint.setWrapText(true);
+    UiSupport.icon(stage);
+    for (var field :
+        new javafx.scene.control.TextInputControl[] {name, brand, color, location, note}) {
+      UiSupport.textMenu(field, messages);
+    }
+    validation.setId("name-validation");
+    error.setId("save-error");
+    cancel.setId("cancel-yarn");
     name.setId("yarn-name");
     brand.setId("yarn-brand");
     color.setId("yarn-color");
     location.setId("yarn-location");
     note.setId("yarn-note");
-    name.setPromptText("Zum Beispiel Merino weich");
-    brand.setPromptText("Optional");
-    color.setPromptText("Zum Beispiel Salbeigrün");
-    location.setPromptText("Zum Beispiel Schrank, Box 2");
-    note.setPromptText("Was möchtest du dir zu diesem Garn merken?");
+    name.setPromptText(messages.text("editor.namePrompt"));
+    brand.setPromptText(messages.text("field.optional"));
+    color.setPromptText(messages.text("editor.colorPrompt"));
+    location.setPromptText(messages.text("editor.locationPrompt"));
+    note.setPromptText(messages.text("editor.notePrompt"));
     note.setWrapText(true);
     note.setPrefRowCount(4);
     for (Label label : new Label[] {validation, error, progress}) {
@@ -120,22 +139,23 @@ final class YarnEditor {
           updatePhotoButtons();
           error.setVisible(false);
         });
-    Label photoHint =
-        new Label(
-            "Ein JPEG oder PNG. Max. 10 MiB, 6000 Pixel je Seite und 16 Millionen Pixel insgesamt.");
+    Label photoHint = new Label(messages.text("photo.hint"));
     photoHint.setWrapText(true);
+    photoHint.setMinHeight(Region.USE_PREF_SIZE);
     photoHint.setMaxWidth(232);
     photoHint.getStyleClass().add("muted");
-    VBox photoForm = new VBox(10, new Label("Foto · optional"), preview, choose, remove, photoHint);
+    VBox photoForm =
+        new VBox(
+            10, new Label(messages.text("photo.optional")), preview, choose, remove, photoHint);
     VBox fields =
         new VBox(
             12,
-            field("Bezeichnung *", name),
+            field(messages.text("field.requiredName"), name),
             validation,
-            field("Marke / Hersteller", brand),
-            field("Farbe", color),
-            field("Aufbewahrungsort", location),
-            field("Notiz", note));
+            field(messages.text("field.brand"), brand),
+            field(messages.text("field.color"), color),
+            field(messages.text("field.location"), location),
+            field(messages.text("field.note"), note));
     fields.setMinWidth(280);
     HBox.setHgrow(fields, Priority.ALWAYS);
     HBox columns = new HBox(24, fields, photoForm);
@@ -204,17 +224,23 @@ final class YarnEditor {
       return;
     }
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Foto auswählen");
+    chooser.setTitle(messages.text("photo.chooserTitle"));
     chooser
         .getExtensionFilters()
         .add(
             new FileChooser.ExtensionFilter(
-                "JPEG- und PNG-Bilder", "*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"));
+                messages.text("photo.filter"),
+                "*.jpg",
+                "*.jpeg",
+                "*.png",
+                "*.JPG",
+                "*.JPEG",
+                "*.PNG"));
     File selected = chooser.showOpenDialog(stage);
     if (selected == null) {
       return;
     }
-    setBusy(true, "Foto wird geprüft …");
+    setBusy(true, messages.text("photo.checking"));
     error.setVisible(false);
     tasks.submit(
         () -> {
@@ -248,12 +274,12 @@ final class YarnEditor {
               current.note(),
               current.photo());
     } catch (IllegalArgumentException exception) {
-      validation.setText(exception.getMessage());
+      validation.setText(messages.text("validation.name"));
       validation.setVisible(true);
       name.requestFocus();
       return;
     }
-    setBusy(true, "Wird gespeichert …");
+    setBusy(true, messages.text("save.busy"));
     error.setVisible(false);
     tasks.submit(
         () -> service.save(id, draft),
@@ -269,7 +295,7 @@ final class YarnEditor {
   }
 
   private void showError(Throwable failure) {
-    error.setText(UiSupport.message(failure));
+    error.setText(UiSupport.message(failure, messages));
     error.setVisible(true);
   }
 
@@ -289,7 +315,7 @@ final class YarnEditor {
 
   private void updatePhotoButtons() {
     choose.setDisable(busy);
-    choose.setText(photo == null ? "Foto auswählen …" : "Foto ersetzen …");
+    choose.setText(photo == null ? messages.text("photo.choose") : messages.text("photo.replace"));
     remove.setDisable(busy || photo == null);
   }
 
@@ -300,10 +326,10 @@ final class YarnEditor {
     if (input().equals(original)
         || UiSupport.confirm(
             stage,
-            "Änderungen verwerfen?",
-            "Deine ungespeicherten Text- und Fotoänderungen gehen beim Verwerfen verloren.",
-            "Verwerfen",
-            "Weiterbearbeiten")) {
+            messages.text("discard.title"),
+            messages.text("discard.detail"),
+            messages.text("action.discard"),
+            messages.text("action.keep"))) {
       stage.hide();
     }
   }

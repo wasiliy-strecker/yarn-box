@@ -1,0 +1,5 @@
+Bezeichnung, Marke, Farbe, Ort und Notizen verwalten
+Ein optionales JPEG- oder PNG-Foto pro Garn
+Alle fünf Textfelder durchsuchen
+Lokale Speicherung ohne Konto
+Sechs wählbare Oberflächensprachen

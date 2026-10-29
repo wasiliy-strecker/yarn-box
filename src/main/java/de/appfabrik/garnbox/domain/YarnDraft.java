@@ -6,7 +6,7 @@ public record YarnDraft(
   public YarnDraft {
     name = name == null ? "" : name.strip();
     if (name.codePoints().noneMatch(c -> !Character.isWhitespace(c) && !Character.isSpaceChar(c))) {
-      throw new IllegalArgumentException("Bitte gib eine Bezeichnung ein.");
+      throw new IllegalArgumentException("Yarn name is required");
     }
     brand = brand == null ? "" : brand.strip();
     color = color == null ? "" : color.strip();

@@ -1,6 +1,6 @@
 # Architektur und Bewerbungsgespräch
 
-GarnBox hat ein Maven-Modul und vier kleine Bereiche. Die bewährten Muster von
+GarnBox hat ein Maven-Modul und fünf kleine Bereiche. Die bewährten Muster von
 BücherRegal wurden gezielt angepasst. Es gibt weder eine gemeinsame Bibliothek
 noch eine Runtime-Abhängigkeit zwischen den beiden Apps.
 
@@ -18,7 +18,8 @@ flowchart LR
 | --- | --- |
 | `domain` | Unveränderliche Records `Yarn`, `YarnDraft` und die Byte-Werteklasse `Photo` |
 | `application` | Pflichtfeldverwendung, Suche, Speichervorgänge, Repository-Vertrag und Bildvalidierung |
-| `persistence` | App-Datenpfad, Schema-Version, JDBC und atomare SQL-Anweisungen |
+| `persistence` | App-Datenpfad, Schema-Version, JDBC, atomare SQL-Anweisungen und Spracheinstellung |
+| `i18n` | Unterstützte Sprachen, UTF-8-Kataloge und lokalisierte Zahlen |
 | `ui` | JavaFX-Fenster, Entwurfszustand, Vorschau, Hintergrundaufgaben und Rückmeldungen |
 
 `YarnsApplication` verbindet die Komponenten über Konstruktoren. Die
@@ -100,7 +101,7 @@ diesen kleinen Ablauf nachvollziehbar. Alle Änderungen an Steuerelementen laufe
 über JavaFX-Task-Callbacks auf dem UI-Thread.
 
 Die Suche arbeitet auf den bereits geladenen Texten. Unicode-Normalisierung
-(NFC), `Locale.ROOT`, Streams und ein deutscher `Collator` liefern reproduzierbare
+(NFC), `Locale.ROOT`, Streams und ein `Collator` der gewählten Sprache liefern reproduzierbare
 Suche und Sortierung. Die interne ID unterscheidet gleichnamige Einträge.
 
 ## Grenzen und Quellen
@@ -113,3 +114,17 @@ noch erforderlich, insbesondere mit Fotos von dort üblichen Quellen.
 Die API-Entscheidungen wurden anhand der offiziellen Dokumentation geprüft:
 [ImageReader in Java 21](https://docs.oracle.com/en/java/javase/21/docs/api/java.desktop/javax/imageio/ImageReader.html)
 und [Image in JavaFX 21](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/image/Image.html).
+
+## Lokalisierung
+
+`YarnsApplication.init` lädt die kleine Spracheinstellung vor dem UI-Start.
+`Messages` bleibt für die Laufzeit eines Fensters unverändert. Dadurch passen
+auch verzögerte Rückmeldungen zur sichtbaren Sprache. `StorageException` und
+`PhotoException` transportieren stabile Codes. Erst `UiSupport` ordnet ihnen
+den jeweiligen übersetzten Text zu. Technische Details werden nicht als rohe
+Ausnahmemeldung in der Oberfläche angezeigt.
+
+`LanguagePreferences` speichert die Wahl mit temporärer Datei und atomarem
+Austausch im selben Datenverzeichnis. Es gibt keine Schema-Migration oder
+Änderung von Foto-BLOBs. Das Paket enthält `jdk.localedata` für dieselbe
+regionale Zahlendarstellung und Sortierung wie das Entwicklungs-JDK.

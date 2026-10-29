@@ -2,6 +2,7 @@ package de.appfabrik.garnbox.ui;
 
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Yarn;
+import de.appfabrik.garnbox.i18n.Messages;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -25,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 final class MainWindow {
+  private final Messages messages;
   private final Stage stage;
   private final YarnService service;
   private final AsyncTasks tasks;
@@ -35,24 +37,68 @@ final class MainWindow {
   private final Label emptyHint = new Label();
   private final Label status = new Label();
   private final TextArea note = new TextArea();
-  private final PhotoPreview preview = new PhotoPreview(240, 180);
-  private final Button add = new Button("+  Garn hinzufügen");
-  private final Button edit = new Button("Bearbeiten");
-  private final Button delete = new Button("Löschen");
-  private final Button reload = new Button("Neu laden");
+  private final PhotoPreview preview;
+  private final de.appfabrik.garnbox.persistence.LanguagePreferences preferences;
+  private String languageChoice;
+  private final boolean languageReadFailed;
+  private final Button language = new Button();
+  private final Button add = new Button();
+  private final Button edit = new Button();
+  private final Button delete = new Button();
+  private final Button reload = new Button();
   private final List<Yarn> yarns = new ArrayList<>();
   private boolean busy;
   private boolean ready;
   private boolean loadFailed;
   private YarnEditor editor;
 
-  MainWindow(Stage stage, YarnService service, AsyncTasks tasks) {
+  MainWindow(
+      Stage stage,
+      YarnService service,
+      AsyncTasks tasks,
+      Messages messages,
+      de.appfabrik.garnbox.persistence.LanguagePreferences preferences,
+      String languageChoice,
+      boolean languageReadFailed) {
+    this.messages = messages;
+    this.preferences = preferences;
+    this.languageChoice = languageChoice;
+    this.languageReadFailed = languageReadFailed;
+    preview = new PhotoPreview(240, 180, messages);
+    preview.setId("selected-photo");
+    add.setText("+  " + messages.text("yarn.add"));
+    edit.setText(messages.text("action.edit"));
+    delete.setText(messages.text("action.delete"));
+    reload.setText(messages.text("action.reload"));
+    language.setText(messages.text("language.title"));
+    language.setId("language-settings");
+    language.setOnAction(
+        event ->
+            new LanguageDialog(
+                    stage,
+                    messages,
+                    tasks,
+                    preferences,
+                    this.languageChoice,
+                    choice -> {
+                      this.languageChoice = choice;
+                      showStatus(messages.text("language.saved"), false);
+                    })
+                .show());
+    UiSupport.textMenu(search, messages);
+    UiSupport.textMenu(note, messages);
+    note.setId("selected-note");
+    status.setId("status-message");
+    count.setId("yarn-count");
+    edit.setId("edit-yarn");
+    delete.setId("delete-yarn");
+    reload.setId("reload-yarns");
     this.stage = stage;
     this.service = service;
     this.tasks = tasks;
     Label heading = new Label("GarnBox");
     heading.getStyleClass().add("app-heading");
-    Label subname = new Label("Deine Garne. Gut aufgehoben.");
+    Label subname = new Label(messages.text("app.subtitle"));
     subname.getStyleClass().add("muted");
     Region spacer = new Region();
     HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -62,11 +108,12 @@ final class MainWindow {
     HBox header = new HBox(20, new VBox(4, heading, subname), spacer, add);
     header.setAlignment(Pos.CENTER_LEFT);
     search.setId("search-yarns");
-    search.setPromptText("Bezeichnung, Marke, Farbe, Aufbewahrungsort oder Notiz suchen");
-    search.setAccessibleText("Garne durchsuchen");
+    search.setPromptText(messages.text("search.prompt"));
+    search.setAccessibleText(messages.text("search.accessible"));
     search.textProperty().addListener((observable, previous, current) -> refresh(null));
     HBox.setHgrow(search, Priority.ALWAYS);
-    Button clear = new Button("Suche leeren");
+    Button clear = new Button(messages.text("search.clear"));
+    clear.setId("clear-search");
     clear.setOnAction(
         event -> {
           search.clear();
@@ -76,10 +123,10 @@ final class MainWindow {
     HBox searchBar = new HBox(10, search, clear);
     table.setId("yarns-table");
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-    table.getColumns().add(column("Bezeichnung", Yarn::name, 360));
-    table.getColumns().add(column("Marke", Yarn::brand, 190));
-    table.getColumns().add(column("Farbe", Yarn::color, 170));
-    table.getColumns().add(column("Aufbewahrungsort", Yarn::location, 240));
+    table.getColumns().add(column(messages.text("field.name"), Yarn::name, 360));
+    table.getColumns().add(column(messages.text("field.brandShort"), Yarn::brand, 190));
+    table.getColumns().add(column(messages.text("field.color"), Yarn::color, 170));
+    table.getColumns().add(column(messages.text("field.location"), Yarn::location, 240));
     table
         .getSelectionModel()
         .selectedItemProperty()
@@ -87,9 +134,7 @@ final class MainWindow {
             (observable, previous, selected) -> {
               note.setText(selected == null ? "" : selected.note());
               note.setPromptText(
-                  selected == null
-                      ? "Wähle ein Garn aus, um seine Notiz zu lesen."
-                      : "Für dieses Garn ist keine Notiz hinterlegt.");
+                  selected == null ? messages.text("note.select") : messages.text("note.empty"));
               if (selected == null || !selected.hasPhoto()) {
                 preview.showImage(null);
               } else {
@@ -135,13 +180,13 @@ final class MainWindow {
     HBox.setHgrow(actionsSpacer, Priority.ALWAYS);
     HBox actions = new HBox(10, count, actionsSpacer, edit, delete);
     actions.setAlignment(Pos.CENTER_LEFT);
-    Label noteHeading = new Label("Notiz");
+    Label noteHeading = new Label(messages.text("field.note"));
     noteHeading.getStyleClass().add("field-label");
     note.setEditable(false);
     note.setWrapText(true);
     note.setPrefRowCount(3);
-    note.setPromptText("Wähle ein Garn aus, um seine Notiz zu lesen.");
-    note.setAccessibleText("Notiz des ausgewählten Garnes");
+    note.setPromptText(messages.text("note.select"));
+    note.setAccessibleText(messages.text("note.accessible"));
     status.setWrapText(true);
     status.setMinHeight(Region.USE_PREF_SIZE);
     status.getStyleClass().add("muted");
@@ -149,9 +194,9 @@ final class MainWindow {
     status.setMinWidth(0);
     HBox.setHgrow(status, Priority.ALWAYS);
     reload.setOnAction(event -> load());
-    reload.setPrefWidth(120);
+
     reload.setMinWidth(Region.USE_PREF_SIZE);
-    HBox footer = new HBox(16, status, reload);
+    HBox footer = new HBox(16, status, language, reload);
     footer.setAlignment(Pos.CENTER_LEFT);
     VBox details = new VBox(6, noteHeading, note);
     HBox.setHgrow(details, Priority.ALWAYS);
@@ -175,6 +220,7 @@ final class MainWindow {
               search.selectAll();
             });
     stage.setTitle("GarnBox");
+    UiSupport.icon(stage);
     stage.setMinWidth(860);
     stage.setMinHeight(700);
     stage.setScene(scene);
@@ -209,7 +255,7 @@ final class MainWindow {
     }
     setBusy(true);
     loadFailed = false;
-    showStatus("Sammlung wird geöffnet …", false);
+    showStatus(messages.text("loading"), false);
     refresh(null);
     tasks.submit(
         service::load,
@@ -219,13 +265,13 @@ final class MainWindow {
           ready = true;
           setBusy(false);
           refresh(null);
-          showStatus("Lokal auf diesem Computer gespeichert", false);
+          showStatus(messages.text(languageReadFailed ? "language.loadError" : "stored"), false);
         },
         failure -> {
           loadFailed = true;
           setBusy(false);
           refresh(null);
-          showStatus(UiSupport.message(failure), true);
+          showStatus(UiSupport.message(failure, messages), true);
         });
   }
 
@@ -247,25 +293,19 @@ final class MainWindow {
               });
     }
     count.setText(
-        !ready
-            ? ""
-            : search.getText().isBlank()
-                ? yarns.size() + (yarns.size() == 1 ? " Garneintrag" : " Garneinträge")
-                : matches.size() + " von " + yarns.size() + " Garneinträgen");
+        !ready ? "" : messages.count(matches.size(), yarns.size(), !search.getText().isBlank()));
     if (loadFailed) {
-      emptyTitle.setText("Sammlung nicht geladen");
-      emptyHint.setText("Bitte beachte den Hinweis unten und versuche es mit „Neu laden“ erneut.");
+      emptyTitle.setText(messages.text("empty.failed"));
+      emptyHint.setText(messages.text("empty.failedHint"));
     } else if (!ready) {
-      emptyTitle.setText("Deine Sammlung wird geöffnet …");
+      emptyTitle.setText(messages.text("loading"));
       emptyHint.setText("");
     } else if (yarns.isEmpty()) {
-      emptyTitle.setText("Platz für dein erstes Garn");
-      emptyHint.setText(
-          "Mit „Garn hinzufügen“ legst du deine Sammlung an. Eine Bezeichnung genügt für den Anfang.");
+      emptyTitle.setText(messages.text("empty.title"));
+      emptyHint.setText(messages.text("empty.hint"));
     } else {
-      emptyTitle.setText("Keine Garne gefunden");
-      emptyHint.setText(
-          "Versuche einen anderen Suchbegriff oder leere die Suche, um alle Garne zu sehen.");
+      emptyTitle.setText(messages.text("empty.search"));
+      emptyHint.setText(messages.text("empty.searchHint"));
     }
     updateButtons();
   }
@@ -292,15 +332,16 @@ final class MainWindow {
                     refresh(saved.id());
                     showStatus(
                         YarnService.search(List.of(saved), search.getText()).isEmpty()
-                            ? "Garn gespeichert. Es passt nicht zur aktuellen Suche."
-                            : "Lokal auf diesem Computer gespeichert",
+                            ? messages.text("saved.filtered")
+                            : messages.text("stored"),
                         false);
-                  });
+                  },
+                  messages);
           editor.show();
         },
         failure -> {
           setBusy(false);
-          showStatus(UiSupport.message(failure), true);
+          showStatus(UiSupport.message(failure, messages), true);
         });
   }
 
@@ -318,14 +359,14 @@ final class MainWindow {
     }
     if (!UiSupport.confirm(
         stage,
-        "Garn löschen?",
-        "„" + selected.name() + "“ wird dauerhaft aus deiner Sammlung entfernt.",
-        "Löschen",
-        "Abbrechen")) {
+        messages.text("delete.title"),
+        messages.text("delete.detail", selected.name()),
+        messages.text("action.delete"),
+        messages.text("action.cancel"))) {
       return;
     }
     setBusy(true);
-    showStatus("Garn wird gelöscht …", false);
+    showStatus(messages.text("delete.busy"), false);
     tasks.submit(
         () -> {
           service.delete(selected.id());
@@ -335,11 +376,11 @@ final class MainWindow {
           yarns.removeIf(yarn -> yarn.id() == deleted.id());
           setBusy(false);
           refresh(null);
-          showStatus("Lokal auf diesem Computer gespeichert", false);
+          showStatus(messages.text("stored"), false);
         },
         failure -> {
           setBusy(false);
-          showStatus(UiSupport.message(failure), true);
+          showStatus(UiSupport.message(failure, messages), true);
         });
   }
 
@@ -352,6 +393,7 @@ final class MainWindow {
 
   private void updateButtons() {
     add.setDisable(busy || !ready || loadFailed);
+    language.setDisable(busy || !ready || loadFailed);
     boolean unavailable = busy || loadFailed || table.getSelectionModel().getSelectedItem() == null;
     edit.setDisable(unavailable);
     delete.setDisable(unavailable);

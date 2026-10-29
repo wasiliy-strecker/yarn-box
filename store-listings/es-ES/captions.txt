@@ -1,0 +1,4 @@
+Consulta tu colección de hilos con fotos y notas.
+Edita los detalles y añade o sustituye una foto.
+Encuentra el hilo adecuado a través de tus notas.
+Elige el idioma para el próximo inicio.

@@ -1,0 +1,5 @@
+GarnBox bringt Ordnung in deine Garnsammlung. Erfasse Bezeichnung, Marke, Farbe, Aufbewahrungsort und persönliche Notizen. Ein optionales Foto hilft dir, das passende Garn wiederzuerkennen.
+
+Durchsuche alle fünf Textfelder, bearbeite Einträge und behalte deinen Vorrat im Blick. JPEG- und PNG-Fotos werden mit dem Eintrag gespeichert. Die Originaldateien bleiben unverändert.
+
+Deine Sammlung bleibt lokal auf deinem Computer. Kein Konto und keine Internetverbindung erforderlich. Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch (Brasilien) verfügbar. Eine Sprachänderung wird beim nächsten Start übernommen.

@@ -1,0 +1,5 @@
+Gestiona nombres, marcas, colores, ubicaciones y notas
+Una foto JPEG o PNG opcional por entrada
+Busca en los cinco campos de texto
+Almacenamiento local sin cuenta
+Seis idiomas de interfaz disponibles

@@ -12,6 +12,8 @@ JavaFX wird als Modul in die Laufzeit eingebunden. Die eigene App bleibt ein
 gewöhnliches Java-Projekt ohne `module-info.java`. Der Anwender benötigt kein
 separates Java. Die vollständigen Runtime-Verzeichnisse müssen zusammenbleiben. `java.desktop`
 ist über `java.se` enthalten und stellt die ImageIO-Decoder bereit.
+`jdk.localedata` enthält die regionalen Daten für alle sechs Oberflächensprachen.
+Linux verwendet das app-eigene PNG-Icon, Windows das mehrstufige ICO.
 
 ## Lokales Linux-App-Image
 
@@ -73,7 +75,8 @@ Der GitHub-Workflow `Verify` prüft Java, SQLite und Bildimport auf Linux, Windo
 `Build native test packages` wird manuell gestartet und erzeugt Windows-x64-,
 macOS-x64- und macOS-arm64-Testartefakte. Er erstellt keine GitHub-Releases
 und lädt nichts in einen Store. Die Workflows sind vorbereitet, aber noch
-nicht auf GitHub ausgeführt. Eine Remote-Adresse ist noch nicht gesetzt.
+nicht im Rahmen dieser Aufgabe auf GitHub ausgeführt. Das GitHub-Repository
+heißt `yarn-box`. Der Internationalisierungsstand wird zunächst lokal committet.
 
 ## Offene Store-Schritte
 
@@ -99,3 +102,7 @@ Quellen für die später erneut zu prüfenden Vorgaben:
 - [Apple: Distribution und App Sandbox](https://help.apple.com/xcode/mac/current/en.lproj/dev91fe7130a.html)
 - [Microsoft: Store-Überblick](https://learn.microsoft.com/en-us/windows/apps/publish/)
 - [GitHub: Verfügbare Runner](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job)
+
+Die [Internationalisierungsanleitung](internationalization.md) beschreibt den
+separaten Test des paketierten Launchers sowie die Ausgabe der lokalisierten
+Texte, Icons und Linux-Vorschau-Bilder als Ordner ohne ZIP.

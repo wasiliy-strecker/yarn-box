@@ -39,8 +39,9 @@ try {
         "--vendor", "Wasiliy Strecker", "--description", "GarnBox - deine lokale Garnsammlung",
         "--input", $InputDirectory, "--main-jar", "garnbox-$Version.jar",
         "--main-class", "de.appfabrik.garnbox.Launcher",
+        "--icon", (Join-Path $Root "assets\branding\icon.ico"),
         "--module-path", "$env:JAVA_HOME\jmods;$Modules",
-        "--add-modules", "java.se,javafx.controls,jdk.unsupported",
+        "--add-modules", "java.se,javafx.controls,jdk.unsupported,jdk.localedata",
         "--java-options", "--add-modules=javafx.controls",
         "--java-options", "-Dfile.encoding=UTF-8"
     )

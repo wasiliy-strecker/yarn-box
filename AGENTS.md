@@ -9,7 +9,16 @@ Stufe 2 des Hobby-Portfolios. Garne mit Bezeichnung, Marke, Farbe, Ort, Notiz
 und genau einem optionalen Foto lokal verwalten. Keine weiteren Hauptfunktionen.
 Java 21, JavaFX 21.0.11, SQLite JDBC und ein Maven-Modul. Pakete `domain`,
 `application`, `persistence` und `ui`. Keine gemeinsame Runtime mit anderen Apps.
-Java-Bezeichner sind englisch, Oberfläche und Projektdokumentation deutsch.
+Java-Bezeichner und GitHub-Repository-Metadaten sind englisch. Die Oberfläche
+unterstützt de-DE, en-US, es-ES, fr-FR, it-IT und pt-BR. Projektdokumentation ist
+deutsch. Eigene UI-Texte gehören in die app-lokalen UTF-8-Sprachkataloge.
+Fehler aus Anwendung und Persistenz verwenden stabile Codes, die UI übersetzt sie.
+Sprachwahl gilt ab Neustart und darf weder Textdaten noch Foto-BLOBs ändern.
+
+Internationalisierungs-Vorschauen gemäß `docs/internationalization.md` als
+Ordner liefern. Keine ZIP-Datei ohne ausdrücklichen Nutzerauftrag. Aufnahmen
+stammen aus der echten App mit synthetischen Daten auf einem eigenen Xvfb.
+Linux-Vorschauen nicht als geprüfte Windows-Store-Bilder bezeichnen.
 
 ## Tatsächlich verwendete Befehle
 

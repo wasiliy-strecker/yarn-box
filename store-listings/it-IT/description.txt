@@ -1,0 +1,5 @@
+GarnBox ti aiuta a organizzare la tua collezione di filati. Registra nome, marca, colore, posizione e note personali. Aggiungi una foto facoltativa per riconoscere il filato che cerchi.
+
+Cerca nei cinque campi di testo, modifica le voci e sfoglia la collezione. Le foto JPEG e PNG vengono salvate con ogni voce. I file originali restano invariati.
+
+La collezione rimane sul tuo computer. Non servono un account o una connessione Internet. L’interfaccia è disponibile in tedesco, inglese, spagnolo, francese, italiano e portoghese brasiliano. Il cambio di lingua ha effetto al successivo avvio.

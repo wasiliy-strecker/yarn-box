@@ -98,32 +98,32 @@ class YarnServiceTest {
   private static final class FailingRepository implements YarnRepository {
     @Override
     public void initialize() {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
 
     @Override
     public List<Yarn> findAll() {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
 
     @Override
     public de.appfabrik.garnbox.domain.Photo findPhoto(long id) {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
 
     @Override
     public Yarn create(YarnDraft draft) {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
 
     @Override
     public Yarn update(long id, YarnDraft draft) {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
 
     @Override
     public void delete(long id) {
-      throw new StorageException("Testfehler");
+      throw new StorageException(StorageException.Code.OPERATION);
     }
   }
 }
