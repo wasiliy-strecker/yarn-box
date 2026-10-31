@@ -1,5 +1,23 @@
 # Prüfbericht
 
+## Schaltfläche zum Neuladen entfernt, 31. Oktober 2026
+
+Die Fußleiste enthält nur noch Info, Sprache, Exportieren und Importieren.
+Die Schaltfläche „Neu laden“ sowie ihre Bindungen und ungenutzten Übersetzungen
+wurden entfernt. Fehlermeldungen in allen sechs Sprachen verweisen bei Bedarf
+auf einen App-Neustart. Das Laden beim Start und die automatische Aktualisierung
+nach Speichern, Löschen und Import bleiben erhalten.
+
+Formatter, Compiler-Lint, Enforcer, Paketbau und SpotBugs bestanden mit
+`./mvnw --no-transfer-progress spotless:apply package spotbugs:check -Dmaven.test.skip=true`.
+Protokoll: `target/remove-reload-build.log`. Auf ausdrücklichen Nutzerwunsch
+keine Tests, kein `verify` und keine automatisierte GUI-Prüfung.
+
+Manuelle Abnahme durch den Nutzer: Die Fußleiste ohne Neuladen-Schaltfläche
+ansehen. Ein Garn hinzufügen, bearbeiten und löschen sowie einen Export
+importieren. Die Liste soll die Änderungen jeweils sofort anzeigen.
+Diese Abläufe wurden hier nicht ausgeführt.
+
 ## Neue Fotos automatisch verkleinern, 31. Oktober 2026
 
 Die Dateiauswahl speichert neue oder ersetzte Fotos mit höchstens 1600 Pixeln

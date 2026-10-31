@@ -67,7 +67,6 @@ final class MainWindow {
   private final Button add = new Button();
   private final Button edit = new Button();
   private final Button delete = new Button();
-  private final Button reload = new Button();
   private final Button export = new Button();
   private final Button importYarns = new Button();
   private final List<Yarn> yarns = new ArrayList<>();
@@ -97,7 +96,6 @@ final class MainWindow {
     add.setText("+  " + messages.text("yarn.add"));
     edit.setText(messages.text("action.edit"));
     delete.setText(messages.text("action.delete"));
-    reload.setText(messages.text("action.reload"));
     export.setText(messages.text("action.export"));
     export.setId("export-yarns");
     export.setMinWidth(Region.USE_PREF_SIZE);
@@ -128,7 +126,6 @@ final class MainWindow {
     count.setId("yarn-count");
     edit.setId("edit-yarn");
     delete.setId("delete-yarn");
-    reload.setId("reload-yarns");
     this.stage = stage;
     this.service = service;
     this.exports = exports;
@@ -231,16 +228,13 @@ final class MainWindow {
     status.setMaxWidth(Double.MAX_VALUE);
     status.setMinWidth(0);
     HBox.setHgrow(status, Priority.ALWAYS);
-    reload.setOnAction(event -> load());
-
-    reload.setMinWidth(Region.USE_PREF_SIZE);
     MenuItem privacy = new MenuItem(messages.text("privacy.title"));
     privacy.setOnAction(event -> new PrivacyDialog(stage, messages).show());
     MenuButton info = new MenuButton(messages.text("info.title"), null, privacy);
     info.setId("app-info");
     info.setMinWidth(Region.USE_PREF_SIZE);
     language.setMinWidth(Region.USE_PREF_SIZE);
-    HBox footer = new HBox(12, status, info, language, export, importYarns, reload);
+    HBox footer = new HBox(12, status, info, language, export, importYarns);
     footer.setAlignment(Pos.CENTER_LEFT);
     VBox details = new VBox(6, noteHeading, note);
     HBox.setHgrow(details, Priority.ALWAYS);
@@ -557,7 +551,6 @@ final class MainWindow {
   private void setBusy(boolean value) {
     busy = value;
     table.setDisable(value);
-    reload.setDisable(value);
     updateButtons();
   }
 
