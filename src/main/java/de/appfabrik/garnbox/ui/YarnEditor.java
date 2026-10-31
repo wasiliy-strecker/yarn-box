@@ -182,6 +182,7 @@ final class YarnEditor {
           }
         });
     stage.setScene(scene);
+    UiSupport.centerAfterLayout(stage);
     stage.setOnCloseRequest(
         event -> {
           event.consume();
@@ -201,6 +202,7 @@ final class YarnEditor {
   }
 
   void show() {
+    stage.setOpacity(0);
     stage.show();
     Platform.runLater(name::requestFocus);
   }

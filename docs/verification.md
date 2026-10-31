@@ -1,5 +1,32 @@
 # Prüfbericht
 
+## Zentrierte Garn-Dialoge, 31. Oktober 2026
+
+„Garn hinzufügen“ und „Garn bearbeiten“ verwenden dieselbe Positionierung
+wie der Datenschutzdialog. Die vorhandene Logik liegt jetzt app-lokal in
+`UiSupport.centerAfterLayout`. Nach nativen Größenkorrekturen wird das Fenster
+über seinem Hauptfenster zentriert, auf den sichtbaren Bildschirmbereich
+begrenzt und anschließend eingeblendet. Beim Schließen stoppen die Timer.
+
+`./mvnw --no-transfer-progress spotless:apply verify` mit Temurin 21.0.13+9
+bestand mit 69 Tests, Compiler-Lint, Enforcer, Spotless und SpotBugs.
+Protokoll: `target/dialog-centering-verify.log`.
+Der vorhandene GUI-Ablauf auf isoliertem Xvfb bestand für en-US einschließlich
+Aufnahmen, 58 Ablaufprüfungen und fünf Prüfungen nach einem Neustart in de-DE.
+Er umfasst Eingaben, Fotos, Speichern, Abbrechen und den Verwerfschutz.
+Die Aufnahme des Bearbeitungsdialogs wurde visuell auf Zentrierung geprüft.
+Nachweise: `target/dialog-centering-gui`.
+
+Das vorhandene Linux-App-Image erhielt das geprüfte App-JAR. Die alte Instanz
+wurde über die Oberfläche regulär geschlossen, ohne eine Verwerfrückfrage zu
+bestätigen. Die aktualisierte App wurde über den Benutzer-Service-Manager
+geöffnet. Auf dem tatsächlichen Ubuntu-Desktop wurden die äußeren Fenstermaße
+einschließlich Titelleisten mit X11 gemessen. Bei einem Hauptfenster von
+1080 × 837 und einem Hinzufügendialog von 660 × 540 Pixeln beträgt die Abweichung
+der Mittelpunkte horizontal 0 und vertikal 0,5 Pixel. Der Dialog bleibt geöffnet.
+Messwerte: `target/dialog-centering-desktop/positions.json`. Visuelle Kontrolle
+bestanden. Diese Prüfung gilt für Ubuntu, nicht für native Windows-/macOS-Fenster.
+
 ## Dauerhafter Start aus der Agentensitzung, 31. Oktober 2026
 
 Yarn Box wurde über den bisherigen `gtk-launch`-Aufruf kurz sichtbar und
