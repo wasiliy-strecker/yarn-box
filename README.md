@@ -11,6 +11,14 @@ Eintrag. Status, Checklisten, Mengenverwaltung, PDF und Cloud gehören nicht daz
 
 ## Starten
 
+Build und CI verwenden Eclipse Temurin 21.0.13+9. Maven prüft Hersteller,
+Version und Buildnummer. Für direkte Maven-Aufrufe auf diesem Rechner:
+
+```bash
+export JAVA_HOME="$HOME/.local/share/garnbox/jdk-21.0.13+9"
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
 Entwicklung mit einem vollständigen JDK 21. `JAVA_HOME` zeigt auf das JDK,
 `PATH` enthält dessen `bin`-Verzeichnis. Der Maven Wrapper lädt Maven und die
 Abhängigkeiten beim ersten Aufruf. Die fertige App arbeitet offline.
@@ -28,7 +36,7 @@ Windows PowerShell:
 ```
 
 Im vorhandenen Linux-Workspace genügt `./scripts/run.sh`. Der Helfer findet
-bei fehlendem `JAVA_HOME` auch das JDK unter `$HOME/.local/jdk-21`.
+bei fehlendem `JAVA_HOME` auch das JDK unter `$HOME/.local/share/garnbox/jdk-21.0.13+9`.
 Das gebaute Linux-App-Image startet ohne separat installiertes Java:
 
 ```bash
@@ -76,6 +84,30 @@ Die [Internationalisierungsanleitung](docs/internationalization.md) beschreibt
 die sechs Store-Textfassungen, eigene Icons und 24 echte Linux-Vorschau-Bilder.
 Die Lieferung erfolgt als Ordner ohne ZIP. Die native Windows-Abnahme folgt
 separat. Die Dateiauswahl verwendet teilweise Beschriftungen des Betriebssystems.
+
+## Datenschutz und Fokusrahmen
+
+„Info“ öffnet die vollständige Datenschutzerklärung offline in der ausgewählten
+App-Sprache. Der Dialog ist scrollbar, schreibgeschützt und kopierbar.
+Escape oder „Schließen“ führen zurück. Er wird erst nach der Positionierung
+sichtbar, damit die anfängliche Korrektur der Fensterposition verborgen bleibt.
+Die Erklärung beschreibt die tatsächlich gespeicherten Texte, Fotos und die
+jeweiligen Projektfunktionen. Originalfotos werden nicht verändert.
+
+Löschschaltflächen erhalten einen roten Fokusrahmen. Die übrigen Schaltflächen
+behalten die jeweilige App-Farbe. Die Auswahlfläche der Tabelle bleibt sichtbar,
+der zusätzliche Rahmen der fokussierten Tabellenzeile ist transparent.
+
+Die sechs identischen Texte für Partner Center lassen sich aus den Ressourcen
+in einen neuen Ausgabeordner exportieren:
+
+```bash
+./scripts/export_privacy.sh target/privacy-texts
+```
+
+Ein vorhandener Ausgabeordner wird nicht überschrieben. Die vorhandenen
+Prüfbedingungen für Vorschau-Lieferungen bleiben bestehen. Der neue Datenschutz-
+ordner wird erst mit einer erneut geprüften Lieferung erzeugt.
 
 ## Daten und Tests
 

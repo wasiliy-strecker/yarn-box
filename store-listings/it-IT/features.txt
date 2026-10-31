@@ -3,3 +3,4 @@ Una foto JPEG o PNG facoltativa per voce
 Ricerca nei cinque campi di testo
 Archiviazione locale senza account
 Sei lingue di interfaccia selezionabili
+Leggere l’informativa sulla privacy offline nell’app

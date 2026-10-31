@@ -3,3 +3,4 @@ One optional JPEG or PNG photo per yarn entry
 Search all five text fields
 Local storage without an account
 Six selectable interface languages
+Read the privacy policy offline inside the app

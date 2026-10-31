@@ -3,3 +3,4 @@ Ein optionales JPEG- oder PNG-Foto pro Garn
 Alle fünf Textfelder durchsuchen
 Lokale Speicherung ohne Konto
 Sechs wählbare Oberflächensprachen
+Die Datenschutzerklärung direkt in der App offline lesen

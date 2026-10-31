@@ -3,3 +3,4 @@ Uma foto JPEG ou PNG opcional por registro
 Pesquisa nos cinco campos de texto
 Armazenamento local sem conta
 Seis idiomas de interface à escolha
+Ler a política de privacidade offline dentro do aplicativo
