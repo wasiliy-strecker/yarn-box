@@ -1,25 +1,34 @@
 package de.appfabrik.garnbox.persistence;
 
+import de.appfabrik.garnbox.application.CollectionImportRepository;
+import de.appfabrik.garnbox.application.ImportResult;
 import de.appfabrik.garnbox.application.PhotoException;
 import de.appfabrik.garnbox.application.PhotoImporter;
 import de.appfabrik.garnbox.application.StorageException;
+import de.appfabrik.garnbox.application.YarnImportSource;
 import de.appfabrik.garnbox.application.YarnRepository;
 import de.appfabrik.garnbox.domain.Photo;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.domain.YarnDraft;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import org.sqlite.SQLiteConfig;
 
 /** Opens and closes one JDBC connection per operation. No connection escapes this class. */
-public final class SqliteYarnRepository implements YarnRepository {
+public final class SqliteYarnRepository implements YarnRepository, CollectionImportRepository {
   private final Path database;
 
   public SqliteYarnRepository(Path database) {
@@ -79,8 +88,15 @@ public final class SqliteYarnRepository implements YarnRepository {
 
   @Override
   public List<Yarn> findAll() {
-    try (Connection connection = connect();
-        var statement = connection.createStatement();
+    try (Connection connection = connect()) {
+      return readYarns(connection);
+    } catch (SQLException exception) {
+      throw failure(exception);
+    }
+  }
+
+  private static List<Yarn> readYarns(Connection connection) throws SQLException {
+    try (var statement = connection.createStatement();
         var result =
             statement.executeQuery(
                 "SELECT id, name, brand, color, location, note, photo IS NOT NULL AS has_photo FROM yarns")) {
@@ -97,9 +113,89 @@ public final class SqliteYarnRepository implements YarnRepository {
                 result.getBoolean("has_photo")));
       }
       return List.copyOf(yarns);
+    }
+  }
+
+  @Override
+  public ImportResult importYarns(YarnImportSource source) {
+    try (Connection connection = connect()) {
+      connection.setAutoCommit(false);
+      try {
+        var available = new HashMap<String, Integer>();
+        int[] counts = new int[2];
+        MessageDigest digest = sha256();
+        try (var existing =
+                connection.prepareStatement(
+                    "SELECT count(*) FROM yarns WHERE name = ? AND brand = ? AND color = ?"
+                        + " AND location = ? AND note = ? AND photo IS ?");
+            var insert =
+                connection.prepareStatement(
+                    "INSERT INTO yarns (name, brand, color, location, note, photo) VALUES (?, ?, ?, ?, ?, ?)")) {
+          source.read(
+              draft -> {
+                String key = fingerprint(draft, digest);
+                try {
+                  Integer copies = available.get(key);
+                  if (copies == null) {
+                    bind(existing, draft);
+                    try (var result = existing.executeQuery()) {
+                      if (!result.next()) {
+                        throw new SQLException("Missing duplicate count");
+                      }
+                      copies = result.getInt(1);
+                    }
+                  }
+                  if (copies > 0) {
+                    available.put(key, copies - 1);
+                    counts[1]++;
+                  } else {
+                    available.put(key, 0);
+                    bind(insert, draft);
+                    if (insert.executeUpdate() != 1) {
+                      throw new SQLException("Incomplete collection import");
+                    }
+                    counts[0]++;
+                  }
+                } catch (SQLException exception) {
+                  throw failure(exception);
+                }
+              });
+        }
+        var result = new ImportResult(counts[0], counts[1], readYarns(connection));
+        connection.commit();
+        return result;
+      } catch (SQLException | RuntimeException exception) {
+        connection.rollback();
+        throw exception;
+      }
     } catch (SQLException exception) {
       throw failure(exception);
     }
+  }
+
+  private static MessageDigest sha256() {
+    try {
+      return MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException impossible) {
+      throw new IllegalStateException("SHA-256 is required by the Java runtime", impossible);
+    }
+  }
+
+  private static String fingerprint(YarnDraft draft, MessageDigest digest) {
+    digest.reset();
+    for (String value :
+        List.of(draft.name(), draft.brand(), draft.color(), draft.location(), draft.note())) {
+      byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+      digest.update(ByteBuffer.allocate(Integer.BYTES).putInt(bytes.length).array());
+      digest.update(bytes);
+    }
+    byte[] photo = draft.photo() == null ? null : draft.photo().bytes();
+    digest.update(
+        ByteBuffer.allocate(Integer.BYTES).putInt(photo == null ? -1 : photo.length).array());
+    if (photo != null) {
+      digest.update(photo);
+    }
+    return HexFormat.of().formatHex(digest.digest());
   }
 
   @Override

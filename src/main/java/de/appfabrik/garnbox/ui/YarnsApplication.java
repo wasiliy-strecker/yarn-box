@@ -1,6 +1,7 @@
 package de.appfabrik.garnbox.ui;
 
 import de.appfabrik.garnbox.application.CollectionExport;
+import de.appfabrik.garnbox.application.CollectionImport;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.i18n.AppLanguage;
 import de.appfabrik.garnbox.i18n.Messages;
@@ -70,10 +71,12 @@ public final class YarnsApplication extends Application {
     var repository = new SqliteYarnRepository(directory.resolve("garnbox.db"));
     YarnService service = new YarnService(repository);
     var exports = new CollectionExport(repository, new JsonCollectionFile());
+    var imports = new CollectionImport(repository, new JsonCollectionFile());
     new MainWindow(
             stage,
             service,
             exports,
+            imports,
             tasks,
             messages,
             preferences,

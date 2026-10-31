@@ -1,19 +1,198 @@
 package de.appfabrik.garnbox.persistence;
 
+import com.google.gson.Strictness;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.MalformedJsonException;
 import de.appfabrik.garnbox.application.CollectionFile;
+import de.appfabrik.garnbox.application.ImportException;
+import de.appfabrik.garnbox.application.PhotoException;
+import de.appfabrik.garnbox.application.PhotoImporter;
+import de.appfabrik.garnbox.domain.Photo;
 import de.appfabrik.garnbox.domain.YarnDraft;
+import java.io.EOFException;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /** Versioned UTF-8 JSON, including selected colors and original photo bytes. */
 public final class JsonCollectionFile implements CollectionFile {
+  private static final long MAX_IMPORT_BYTES = 256L * 1024 * 1024;
+  private static final int MAX_ENTRIES = 10_000;
+  private static final int MAX_TEXT_LENGTH = 1_048_576;
+  private static final Set<String> ENTRY_FIELDS =
+      Set.of("name", "brand", "color", "location", "note", "photoBase64");
+
+  @Override
+  public void read(Path source, Consumer<YarnDraft> accept) {
+    try {
+      if (!Files.isRegularFile(source)) {
+        throw new ImportException(ImportException.Code.READ);
+      }
+      if (Files.size(source) > MAX_IMPORT_BYTES) {
+        throw new ImportException(ImportException.Code.LIMIT);
+      }
+      var decoder =
+          StandardCharsets.UTF_8
+              .newDecoder()
+              .onMalformedInput(CodingErrorAction.REPORT)
+              .onUnmappableCharacter(CodingErrorAction.REPORT);
+      try (var input = new LimitedInput(Files.newInputStream(source));
+          var reader = new JsonReader(new InputStreamReader(input, decoder))) {
+        reader.setStrictness(Strictness.STRICT);
+        reader.beginObject();
+        Set<String> keys = new HashSet<>();
+        while (reader.hasNext()) {
+          String key = reader.nextName();
+          require(keys.add(key));
+          switch (key) {
+            case "format" -> require(readText(reader).equals("yarn-box.collection"));
+            case "version" -> {
+              require(reader.peek() == JsonToken.NUMBER);
+              if (!reader.nextString().equals("1")) {
+                throw new ImportException(ImportException.Code.VERSION);
+              }
+            }
+            case "yarns" -> readEntries(reader, accept);
+            default -> throw new ImportException(ImportException.Code.FORMAT);
+          }
+        }
+        reader.endObject();
+        require(keys.equals(Set.of("format", "version", "yarns")));
+        require(reader.peek() == JsonToken.END_DOCUMENT);
+      }
+    } catch (MalformedJsonException | EOFException | CharacterCodingException exception) {
+      throw new ImportException(ImportException.Code.FORMAT, exception);
+    } catch (IOException | SecurityException exception) {
+      throw new ImportException(ImportException.Code.READ, exception);
+    } catch (IllegalArgumentException | IllegalStateException exception) {
+      throw new ImportException(ImportException.Code.FORMAT, exception);
+    }
+  }
+
+  private static void readEntries(JsonReader reader, Consumer<YarnDraft> accept)
+      throws IOException {
+    reader.beginArray();
+    int count = 0;
+    while (reader.hasNext()) {
+      if (++count > MAX_ENTRIES) {
+        throw new ImportException(ImportException.Code.LIMIT);
+      }
+      reader.beginObject();
+      Set<String> keys = new HashSet<>();
+      var values = new HashMap<String, String>();
+      Photo photo = null;
+      while (reader.hasNext()) {
+        String key = reader.nextName();
+        require(ENTRY_FIELDS.contains(key) && keys.add(key));
+        if (key.equals("photoBase64")) {
+          photo = readPhoto(reader);
+        } else {
+          values.put(key, readText(reader));
+        }
+      }
+      reader.endObject();
+      require(keys.equals(ENTRY_FIELDS));
+      accept.accept(
+          new YarnDraft(
+              values.get("name"),
+              values.get("brand"),
+              values.get("color"),
+              values.get("location"),
+              values.get("note"),
+              photo));
+    }
+    reader.endArray();
+  }
+
+  private static String readText(JsonReader reader) throws IOException {
+    require(reader.peek() == JsonToken.STRING);
+    String value = reader.nextString();
+    if (value.length() > MAX_TEXT_LENGTH) {
+      throw new ImportException(ImportException.Code.LIMIT);
+    }
+    for (int i = 0; i < value.length(); i++) {
+      char character = value.charAt(i);
+      if (Character.isHighSurrogate(character)) {
+        require(i + 1 < value.length() && Character.isLowSurrogate(value.charAt(++i)));
+      } else {
+        require(!Character.isLowSurrogate(character));
+      }
+    }
+    return value;
+  }
+
+  private static Photo readPhoto(JsonReader reader) throws IOException {
+    if (reader.peek() == JsonToken.NULL) {
+      reader.nextNull();
+      return null;
+    }
+    require(reader.peek() == JsonToken.STRING);
+    String encoded = reader.nextString();
+    if (encoded.length() > ((PhotoImporter.MAX_BYTES + 2) / 3) * 4) {
+      throw new ImportException(ImportException.Code.LIMIT);
+    }
+    try {
+      return PhotoImporter.decode(Base64.getDecoder().decode(encoded));
+    } catch (IllegalArgumentException | PhotoException exception) {
+      throw new ImportException(ImportException.Code.PHOTO, exception);
+    }
+  }
+
+  private static void require(boolean valid) {
+    if (!valid) {
+      throw new ImportException(ImportException.Code.FORMAT);
+    }
+  }
+
+  private static final class LimitedInput extends FilterInputStream {
+    private long count;
+
+    private LimitedInput(InputStream input) {
+      super(input);
+    }
+
+    @Override
+    public int read() throws IOException {
+      int value = in.read();
+      if (value != -1) {
+        reserve(1);
+      }
+      return value;
+    }
+
+    @Override
+    public int read(byte[] bytes, int offset, int length) throws IOException {
+      int result = in.read(bytes, offset, (int) Math.min(length, MAX_IMPORT_BYTES - count + 1));
+      if (result > 0) {
+        reserve(result);
+      }
+      return result;
+    }
+
+    private void reserve(int bytes) {
+      count += bytes;
+      if (count > MAX_IMPORT_BYTES) {
+        throw new ImportException(ImportException.Code.LIMIT);
+      }
+    }
+  }
+
   @Override
   public void write(Path target, Iterable<YarnDraft> yarns) throws IOException {
     Path destination = target.toAbsolutePath().normalize();

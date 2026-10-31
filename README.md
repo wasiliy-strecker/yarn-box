@@ -77,7 +77,7 @@ Escape und Fensterschließen fragen bei ungespeicherten Änderungen nach.
 Nach Speicherfehlern bleiben Texte und gewählte Vorschau zum erneuten Speichern
 erhalten. Während Bildprüfung und Speichern wartet der Dialog auf den Abschluss.
 
-## Sammlung exportieren
+## Sammlung exportieren und importieren
 
 „Exportieren“ schreibt die gesamte gespeicherte Sammlung in eine JSON-Datei,
 einschließlich Bezeichnung, Marke, Farbe, Aufbewahrungsort, Notiz und Fotos.
@@ -91,7 +91,22 @@ Farbbeschreibungen bleiben als ursprünglicher Text erhalten. Das Format heißt
 `yarn-box.collection`, Version 1. `photoBase64` enthält die Originalbildbytes
 als Base64 oder `null`, wenn kein Foto vorhanden ist. Der Export wird lokal
 erst nach vollständigem Schreiben veröffentlicht. Die Datei ist unverschlüsselt.
-Das Wiedereinlesen einer JSON-Datei ist derzeit noch nicht verfügbar.
+
+„Importieren“ steht direkt neben „Exportieren“. Wähle einen zuvor erzeugten
+Yarn-Box-Export. Die App ergänzt die Einträge einschließlich Farben, Notizen
+und Fotos in der vorhandenen Sammlung. Vorhandene Einträge werden nicht
+überschrieben. Bereits vorhandene identische Kopien werden übersprungen.
+Gleichnamige Einträge mit anderen Inhalten bleiben eigenständig. Enthält der
+Export mehrere identische Einträge, bleibt ihre Anzahl beim Wiederherstellen
+erhalten. Ein wiederholter Import derselben Datei erzeugt keine weiteren Kopien.
+
+Nach dem Import zeigt die App die Anzahl hinzugefügter und bereits vorhandener
+Einträge und leert einen aktiven Suchfilter. Fehlerhafte Dateien oder Fotos
+führen zum Abbruch des gesamten Imports. Die vorhandene Sammlung und die
+Quelldatei bleiben dabei unverändert. Importgrenzen sind 256 MiB je JSON-Datei,
+10.000 Einträge und 1.048.576 Zeichen je Textfeld. Für Fotos gelten dieselben
+Größen- und Formatgrenzen wie bei der Fotoauswahl. Sprache und gemerkter
+Fotoordner werden nicht importiert.
 
 ## Tastenkürzel
 

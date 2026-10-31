@@ -1,6 +1,8 @@
 package de.appfabrik.garnbox.ui;
 
 import de.appfabrik.garnbox.application.CollectionExport;
+import de.appfabrik.garnbox.application.CollectionImport;
+import de.appfabrik.garnbox.application.ImportException;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.i18n.Messages;
@@ -47,6 +49,7 @@ final class MainWindow {
   private final Stage stage;
   private final YarnService service;
   private final CollectionExport exports;
+  private final CollectionImport imports;
   private final AsyncTasks tasks;
   private final PhotoDirectoryPreferences photoDirectories;
   private final TableView<Yarn> table = new TableView<>();
@@ -66,6 +69,7 @@ final class MainWindow {
   private final Button delete = new Button();
   private final Button reload = new Button();
   private final Button export = new Button();
+  private final Button importYarns = new Button();
   private final List<Yarn> yarns = new ArrayList<>();
   private boolean busy;
   private boolean ready;
@@ -76,6 +80,7 @@ final class MainWindow {
       Stage stage,
       YarnService service,
       CollectionExport exports,
+      CollectionImport imports,
       AsyncTasks tasks,
       Messages messages,
       de.appfabrik.garnbox.persistence.LanguagePreferences preferences,
@@ -97,6 +102,10 @@ final class MainWindow {
     export.setId("export-yarns");
     export.setMinWidth(Region.USE_PREF_SIZE);
     export.setOnAction(event -> exportCollection());
+    importYarns.setText(messages.text("action.import"));
+    importYarns.setId("import-yarns");
+    importYarns.setMinWidth(Region.USE_PREF_SIZE);
+    importYarns.setOnAction(event -> importCollection());
     language.setText(messages.text("language.title"));
     language.setId("language-settings");
     language.setOnAction(
@@ -123,6 +132,7 @@ final class MainWindow {
     this.stage = stage;
     this.service = service;
     this.exports = exports;
+    this.imports = imports;
     this.tasks = tasks;
     Label heading = new Label("GarnBox");
     heading.getStyleClass().add("app-heading");
@@ -230,7 +240,7 @@ final class MainWindow {
     info.setId("app-info");
     info.setMinWidth(Region.USE_PREF_SIZE);
     language.setMinWidth(Region.USE_PREF_SIZE);
-    HBox footer = new HBox(12, status, info, language, export, reload);
+    HBox footer = new HBox(12, status, info, language, export, importYarns, reload);
     footer.setAlignment(Pos.CENTER_LEFT);
     VBox details = new VBox(6, noteHeading, note);
     HBox.setHgrow(details, Priority.ALWAYS);
@@ -478,6 +488,40 @@ final class MainWindow {
         });
   }
 
+  private void importCollection() {
+    if (busy || !ready || loadFailed || (editor != null && editor.isShowing())) {
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle(messages.text("import.title"));
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
+    File selected = chooser.showOpenDialog(stage);
+    if (selected == null) {
+      return;
+    }
+    setBusy(true);
+    showStatus(messages.text("import.busy"), false);
+    tasks.submit(
+        () -> imports.importFile(selected.toPath()),
+        result -> {
+          yarns.clear();
+          yarns.addAll(result.yarns());
+          setBusy(false);
+          search.clear();
+          refresh(null);
+          showStatus(messages.text("import.saved", result.added(), result.skipped()), false);
+        },
+        failure -> {
+          setBusy(false);
+          showStatus(
+              messages.text(
+                  failure instanceof ImportException problem
+                      ? "import.error." + problem.code().name()
+                      : "import.failed"),
+              true);
+        });
+  }
+
   private void deleteSelected() {
     Yarn selected = table.getSelectionModel().getSelectedItem();
     if (selected == null || busy || loadFailed) {
@@ -518,6 +562,7 @@ final class MainWindow {
   }
 
   private void updateButtons() {
+    importYarns.setDisable(busy || !ready || loadFailed);
     export.setDisable(busy || !ready || loadFailed);
     add.setDisable(busy || !ready || loadFailed);
     language.setDisable(busy || !ready || loadFailed);

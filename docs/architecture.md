@@ -49,7 +49,23 @@ Die Datei enthält sämtliche Textfelder einschließlich des exakten Farbwertes
 und ein optionales `photoBase64`. Ein temporäres Geschwister der Zieldatei nimmt
 zunächst den vollständigen Inhalt auf. Erst danach wird die Datei ohne
 Überschreiben eines vorhandenen Zieles verschoben. Fehler lassen die lokale
-Sammlung unverändert. Der Export benötigt keine zusätzliche Bibliothek.
+Sammlung unverändert.
+
+`CollectionImport` ergänzt den Import über `CollectionImportRepository`.
+`JsonCollectionFile` liest mit Gson im strikten Modus und übergibt jeden
+geprüften Eintrag einzeln. Das vorhandene Format `yarn-box.collection`,
+Version 1, bleibt unverändert. UTF-8, Feldtypen, eindeutige Schlüssel,
+Vollständigkeit, Base64 und Bildinhalt werden geprüft. Datei und Eintragszahl
+sind begrenzt. Es werden nicht alle Fotos gleichzeitig im Speicher gehalten.
+
+Das SQLite-Repository führt den gesamten Leser innerhalb einer Transaktion
+aus. Erst nach vollständiger Prüfung der Datei einschließlich ihres Endes
+wird bestätigt. Identische Einträge werden anhand aller Texte und Fotobytes
+abgeglichen. Ein Zähler pro Fingerabdruck erhält die Anzahl identischer Kopien
+aus dem Export, ohne bei erneutem Import zusätzliche Kopien anzulegen. Die
+neue Listenansicht wird aus derselben Transaktion geladen. Fehler führen zum
+Rollback. Neue Einträge erhalten neue interne IDs. Sprache und Fotoordner
+bleiben eigenständige lokale Einstellungen.
 
 ## Entscheidung: SQLite-Bilddaten
 

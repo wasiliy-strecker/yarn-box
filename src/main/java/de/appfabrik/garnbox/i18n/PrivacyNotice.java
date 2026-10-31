@@ -13,6 +13,8 @@ public final class PrivacyNotice {
         + "\n\n"
         + messages.text("privacy.export")
         + "\n\n"
+        + messages.text("privacy.import")
+        + "\n\n"
         + messages.text("privacy.photoDirectory")
         + "\n";
   }

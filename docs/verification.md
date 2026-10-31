@@ -1,5 +1,29 @@
 # Prüfbericht
 
+## Sammlung importieren, 31. Oktober 2026
+
+Eine sichtbare Schaltfläche „Importieren“ neben „Exportieren“ ergänzt.
+Vorhandene Yarn-Box-Exporte im Format `yarn-box.collection`, Version 1,
+werden mit Texten, Farbwerten und Fotos eingelesen. Bestehende Einträge bleiben
+erhalten. Exakt identische Kopien werden unter Berücksichtigung ihrer Anzahl
+übersprungen. Die gesamte Datei wird innerhalb einer SQLite-Transaktion
+verarbeitet. Ungültige Daten oder Fotos führen zum vollständigen Rollback.
+
+Auf ausdrücklichen Nutzerwunsch keine Tests, kein `verify`, keine automatisierte
+GUI-Prüfung und keine Bildschirmaufnahmen. Nur Formatter, Paketbau mit
+`-Dmaven.test.skip=true` und Bereitstellung der benötigten Laufzeitbibliotheken.
+Protokoll: `target/collection-import-build.log`. Gson 2.13.2 und Error Prone
+Annotations 2.41.0 werden mit ihren Lizenzhinweisen ins App-Image übernommen.
+
+Manuelle Abnahme durch den Nutzer: Einen vorhandenen Export importieren und
+Texte, Farben und Fotos ansehen. Dieselbe Datei erneut importieren und die
+gemeldeten übersprungenen Einträge kontrollieren. Gleichnamige Einträge mit
+verschiedenen Inhalten müssen getrennt bleiben. Ein Export mit mehreren
+identischen Einträgen muss deren Anzahl erhalten. Eine beschädigte JSON-Datei
+oder ein ungültiges Foto darf keine Teileinträge hinterlassen. Abbrechen der
+Dateiauswahl lässt die Sammlung unverändert. Import und Neustart sollen die
+ergänzten Daten erhalten. Keine dieser Abläufe wurde hier ausgeführt.
+
 ## Zuletzt gewählter Bilderordner, 31. Oktober 2026
 
 Die Fotoauswahl verwendet eine appweit geteilte, lokal gespeicherte
