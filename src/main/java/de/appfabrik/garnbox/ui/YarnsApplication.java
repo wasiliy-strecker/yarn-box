@@ -1,9 +1,11 @@
 package de.appfabrik.garnbox.ui;
 
+import de.appfabrik.garnbox.application.CollectionExport;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.i18n.AppLanguage;
 import de.appfabrik.garnbox.i18n.Messages;
 import de.appfabrik.garnbox.persistence.AppDataDirectory;
+import de.appfabrik.garnbox.persistence.JsonCollectionFile;
 import de.appfabrik.garnbox.persistence.LanguagePreferences;
 import de.appfabrik.garnbox.persistence.SqliteYarnRepository;
 import java.io.IOException;
@@ -62,9 +64,12 @@ public final class YarnsApplication extends Application {
       javafx.application.Platform.exit();
       return;
     }
-    YarnService service =
-        new YarnService(new SqliteYarnRepository(directory.resolve("garnbox.db")));
-    new MainWindow(stage, service, tasks, messages, preferences, choice, languageReadFailed).show();
+    var repository = new SqliteYarnRepository(directory.resolve("garnbox.db"));
+    YarnService service = new YarnService(repository);
+    var exports = new CollectionExport(repository, new JsonCollectionFile());
+    new MainWindow(
+            stage, service, exports, tasks, messages, preferences, choice, languageReadFailed)
+        .show();
   }
 
   @Override

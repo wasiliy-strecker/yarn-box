@@ -35,7 +35,7 @@ final class YarnEditor {
   private final Stage stage = new Stage();
   private final TextField name = new TextField();
   private final TextField brand = new TextField();
-  private final TextField color = new TextField();
+  private final YarnColorField color;
   private final TextField location = new TextField();
   private final TextArea note = new TextArea();
   private final Label validation = new Label();
@@ -63,6 +63,7 @@ final class YarnEditor {
       Consumer<Yarn> onSaved,
       Messages messages) {
     this.messages = messages;
+    color = new YarnColorField(existing == null ? "" : existing.color(), messages);
     preview = new PhotoPreview(232, 170, messages);
     preview.setId("editor-photo");
     save.setText(messages.text("action.save"));
@@ -77,7 +78,6 @@ final class YarnEditor {
     if (existing != null) {
       name.setText(existing.name());
       brand.setText(existing.brand());
-      color.setText(existing.color());
       location.setText(existing.location());
       note.setText(existing.note());
     }
@@ -93,8 +93,7 @@ final class YarnEditor {
     hint.getStyleClass().add("muted");
     hint.setWrapText(true);
     UiSupport.icon(stage);
-    for (var field :
-        new javafx.scene.control.TextInputControl[] {name, brand, color, location, note}) {
+    for (var field : new javafx.scene.control.TextInputControl[] {name, brand, location, note}) {
       UiSupport.textMenu(field, messages);
     }
     validation.setId("name-validation");
@@ -102,12 +101,10 @@ final class YarnEditor {
     cancel.setId("cancel-yarn");
     name.setId("yarn-name");
     brand.setId("yarn-brand");
-    color.setId("yarn-color");
     location.setId("yarn-location");
     note.setId("yarn-note");
     name.setPromptText(messages.text("editor.namePrompt"));
     brand.setPromptText(messages.text("field.optional"));
-    color.setPromptText(messages.text("editor.colorPrompt"));
     location.setPromptText(messages.text("editor.locationPrompt"));
     note.setPromptText(messages.text("editor.notePrompt"));
     note.setWrapText(true);
@@ -194,7 +191,7 @@ final class YarnEditor {
     updatePhotoButtons();
   }
 
-  private static VBox field(String text, javafx.scene.control.Control control) {
+  private static VBox field(String text, javafx.scene.Node control) {
     Label label = new Label(text);
     label.setLabelFor(control);
     label.getStyleClass().add("field-label");
@@ -213,12 +210,7 @@ final class YarnEditor {
 
   private Input input() {
     return new Input(
-        name.getText(),
-        brand.getText(),
-        color.getText(),
-        location.getText(),
-        note.getText(),
-        photo);
+        name.getText(), brand.getText(), color.value(), location.getText(), note.getText(), photo);
   }
 
   private void choosePhoto() {

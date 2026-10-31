@@ -27,6 +27,30 @@ Anwendungslogik kennt weder JavaFX-Steuerelemente noch JDBC. `PhotoImporter`
 nutzt die Standardbibliothek `java.desktop` für ImageIO, nicht JavaFX.
 Die Pflichtfeldregel selbst sitzt im kompakten Konstruktor von `YarnDraft`.
 
+## Farbauswahl und Sammlungsexport
+
+`YarnColorField` hält die Farbauswahl im Editor. `YarnColors` übersetzt zwischen
+JavaFX-Farben und stabilen sRGB-Hexwerten. Neue Auswahlen verwenden `#RRGGBB`
+beziehungsweise `#RRGGBBAA` mit Alpha. Die bestehende SQLite-Textspalte `color`
+bleibt erhalten. Dadurch benötigen alte Farbbeschreibungen keine automatische
+Migration und bleiben beim Bearbeiten anderer Felder unverändert. Die Liste
+zeigt für Hexwerte ein Farbfeld mit lesbarem Code. Das Entfernen einer Farbe
+gehört wie jede andere Farbänderung zum gemeinsamen Verwerfschutz.
+
+`CollectionExport` arbeitet mit `YarnRepository` und dem app-lokalen Port
+`CollectionFile`. `JsonCollectionFile` schreibt UTF-8-JSON im Format
+`yarn-box.collection`, Version 1. Die Anwendung lädt die vollständige gespeicherte
+Sammlung unabhängig vom Suchfilter. Fotos werden je Eintrag nachgeladen, sodass
+nicht alle Bilddaten gleichzeitig im Speicher liegen. Die UI sperrt während
+des Exports konkurrierende Änderungen. Weitere gleichzeitig schreibende
+App-Instanzen bleiben außerhalb des unterstützten Betriebs.
+
+Die Datei enthält sämtliche Textfelder einschließlich des exakten Farbwertes
+und ein optionales `photoBase64`. Ein temporäres Geschwister der Zieldatei nimmt
+zunächst den vollständigen Inhalt auf. Erst danach wird die Datei ohne
+Überschreiben eines vorhandenen Zieles verschoben. Fehler lassen die lokale
+Sammlung unverändert. Der Export benötigt keine zusätzliche Bibliothek.
+
 ## Entscheidung: SQLite-Bilddaten
 
 Ein nullable BLOB in derselben Tabellenzeile wie die Texte ist für genau ein

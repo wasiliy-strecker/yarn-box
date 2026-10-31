@@ -1,5 +1,27 @@
 # Prüfbericht
 
+## Farbwähler und JSON-Export, 31. Oktober 2026
+
+Auf ausdrücklichen Nutzerwunsch keine Tests, kein `verify`, keine automatisierte
+GUI-Bedienung und keine Bildschirmaufnahmen. Ausgeführt wurden nur Formatter
+und Paketbau mit `./mvnw --no-transfer-progress spotless:apply package
+-Dmaven.test.skip=true`. Buildprotokoll: `target/color-picker-build.log`.
+Die App wird mit dem aktualisierten JAR für die eigene Abnahme geöffnet.
+
+Manuell zu prüfen: Im Hinzufügen- oder Bearbeitungsdialog eine Farbe aus der
+Palette oder eine eigene Farbe auswählen, speichern und Farbfeld sowie Hexwert
+in der Liste ansehen. Den Eintrag erneut öffnen. Eine Farbe entfernen und
+das Verwerfen reiner Farbänderungen prüfen. Bei einem alten Farbeintrag nur
+die Notiz bearbeiten und kontrollieren, dass der bisherige Farbtext erhalten
+bleibt. Anschließend einen solchen Altwert bewusst durch eine Farbe ersetzen.
+
+Den Export mit einer gefilterten Liste ausführen und in der JSON-Datei alle
+gespeicherten Einträge, ihre `color`-Werte sowie `photoBase64` ansehen. Auch einen
+Eintrag ohne Farbe oder Foto berücksichtigen. Vorhandene Exportdateien müssen
+erhalten bleiben. Ein abgebrochener Exportdialog darf keine Datei erzeugen.
+Die bisherigen GUI-Hilfen aus der Internationalisierung erwarten beim Farbfeld
+noch Texteingabe. Sie wurden in diesem Auftrag nicht ausgeführt oder erweitert.
+
 ## Zentrierte Garn-Dialoge, 31. Oktober 2026
 
 „Garn hinzufügen“ und „Garn bearbeiten“ verwenden dieselbe Positionierung

@@ -6,7 +6,11 @@ Workspace-Regeln gelten ergänzend. BücherRegal bleibt unverändert.
 ## Umfang und Architektur
 
 Stufe 2 des Hobby-Portfolios. Garne mit Bezeichnung, Marke, Farbe, Ort, Notiz
-und genau einem optionalen Foto lokal verwalten. Keine weiteren Hauptfunktionen.
+und genau einem optionalen Foto lokal verwalten. Am 31. Oktober 2026 wurden
+zusätzlich ein Farbwähler und ein JSON-Export der Sammlung ausdrücklich beauftragt.
+Neue Farbauswahlen als Hexwerte speichern. Bestehende Farbbeschreibungen erst
+bei einer bewussten Auswahl oder beim Entfernen ersetzen. Der Export umfasst
+alle gespeicherten Einträge und Fotos, unabhängig von Suche und Auswahl.
 Java 21, JavaFX 21.0.11, SQLite JDBC und ein Maven-Modul. Pakete `domain`,
 `application`, `persistence` und `ui`. Keine gemeinsame Runtime mit anderen Apps.
 Java-Bezeichner und GitHub-Repository-Metadaten sind englisch. Die Oberfläche
@@ -98,8 +102,9 @@ Kein Push und keine Veröffentlichung ohne ausdrücklichen Auftrag.
 Build und CI sind auf Eclipse Temurin 21.0.13+9 festgelegt. Eigene Installation
 je App verwenden. Datenschutzdialog und Store-Textexport verwenden dieselben
 sechs Ressourcen. Foto-, Status-, Checklisten- und PDF-Aussagen müssen dem
-Funktionsumfang dieser App entsprechen. Keine BücherRegal-JSON-Funktion allein
-wegen der gemeinsamen Oberfläche übernehmen.
+Funktionsumfang dieser App entsprechen. Der ausdrücklich beauftragte Export
+verwendet das app-lokale Format `yarn-box.collection`. Weitere BücherRegal-
+Transferfunktionen gehören nicht automatisch zum Umfang dieser App.
 
 Der Dialog verwendet die tatsächlichen Fenstermaße nach nativen Größenkorrekturen
 und wird erst nach der Positionierung sichtbar. Destruktive Schaltflächen tragen

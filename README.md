@@ -50,6 +50,13 @@ ist erforderlich. Gleichnamige Einträge sind unabhängig. Die Suche berücksich
 alle fünf Textfelder, Groß- und Kleinschreibung sowie Umlaute. Eine leere Suche
 zeigt die ganze Sammlung. Löschen fragt vorher nach.
 
+Die Farbe wird über einen Farbwähler ausgewählt. In der Liste erscheinen ein
+Farbfeld und der gespeicherte Hexwert. Eigene Farben lassen sich über den
+Farbdialog bestimmen. „×“ entfernt die Auswahl. Die Farbe bleibt optional.
+Vorhandene Farbbeschreibungen bleiben lesbar und werden erst durch eine bewusste
+Farbauswahl oder das Entfernen ersetzt. Eine reine Bearbeitung anderer Felder
+bewahrt diese alten Angaben. Die Suche berücksichtigt auch Hexwerte.
+
 Das ausgewählte Foto wird als eigene Kopie in der lokalen SQLite-Datenbank
 abgelegt. Verschieben oder Löschen des Originals beeinflusst diese Kopie nicht.
 JPEG und PNG werden anhand des Bildinhalts geprüft. Erlaubt sind maximal
@@ -60,6 +67,24 @@ Abbrechen der Dateiauswahl verändert nichts. Abbrechen des Eingabedialogs,
 Escape und Fensterschließen fragen bei ungespeicherten Änderungen nach.
 Nach Speicherfehlern bleiben Texte und gewählte Vorschau zum erneuten Speichern
 erhalten. Während Bildprüfung und Speichern wartet der Dialog auf den Abschluss.
+
+## Sammlung exportieren
+
+„Exportieren“ schreibt die gesamte gespeicherte Sammlung in eine JSON-Datei,
+einschließlich Bezeichnung, Marke, Farbe, Aufbewahrungsort, Notiz und Fotos.
+Die aktuelle Suche und Auswahl begrenzen den Export nicht. Die Dateiauswahl
+schlägt einen Namen mit Datum und Uhrzeit vor. Vorhandene Dateien werden
+bewahrt. Für einen weiteren Export einen neuen Dateinamen wählen.
+
+Gewählte Farben stehen im Feld `color` als `#RRGGBB`, bei Transparenz als
+`#RRGGBBAA`. Eine fehlende Farbe ist eine leere Zeichenfolge. Frühere
+Farbbeschreibungen bleiben als ursprünglicher Text erhalten. Das Format heißt
+`yarn-box.collection`, Version 1. `photoBase64` enthält die Originalbildbytes
+als Base64 oder `null`, wenn kein Foto vorhanden ist. Der Export wird lokal
+erst nach vollständigem Schreiben veröffentlicht. Die Datei ist unverschlüsselt.
+Das Wiedereinlesen einer JSON-Datei ist derzeit noch nicht verfügbar.
+
+## Tastenkürzel
 
 | Taste | Aktion |
 | --- | --- |

@@ -50,3 +50,9 @@
 .photo-preview { -fx-background-color: #ede8e3; -fx-background-radius: 9px; -fx-border-color: #d9cfc5; -fx-border-radius: 9px; }
 .photo-preview .label { -fx-text-fill: #716775; -fx-text-alignment: center; }
 .scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; }
+
+.yarn-color-picker { -fx-color-label-visible: false; -fx-background-color: white; -fx-background-radius: 6px; -fx-border-color: #cbd2c8; -fx-border-radius: 6px; -fx-padding: 9px 8px; -fx-cursor: hand; }
+.yarn-color-picker:focused { -fx-border-color: #6d5279; }
+.color-clear { -fx-padding: 7px 11px; -fx-font-size: 18px; }
+.color-clear:focused { -fx-padding: 5px 9px; }
+.color-code { -fx-font-family: "Monospaced"; -fx-font-size: 12px; }

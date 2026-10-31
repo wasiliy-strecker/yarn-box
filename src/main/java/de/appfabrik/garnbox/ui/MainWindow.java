@@ -1,10 +1,16 @@
 package de.appfabrik.garnbox.ui;
 
+import de.appfabrik.garnbox.application.CollectionExport;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.i18n.Messages;
+import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.EventHandler;
@@ -15,10 +21,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -27,6 +35,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 final class MainWindow {
@@ -34,6 +45,7 @@ final class MainWindow {
   private final Messages messages;
   private final Stage stage;
   private final YarnService service;
+  private final CollectionExport exports;
   private final AsyncTasks tasks;
   private final TableView<Yarn> table = new TableView<>();
   private final TextField search = new TextField();
@@ -51,6 +63,7 @@ final class MainWindow {
   private final Button edit = new Button();
   private final Button delete = new Button();
   private final Button reload = new Button();
+  private final Button export = new Button();
   private final List<Yarn> yarns = new ArrayList<>();
   private boolean busy;
   private boolean ready;
@@ -60,6 +73,7 @@ final class MainWindow {
   MainWindow(
       Stage stage,
       YarnService service,
+      CollectionExport exports,
       AsyncTasks tasks,
       Messages messages,
       de.appfabrik.garnbox.persistence.LanguagePreferences preferences,
@@ -75,6 +89,10 @@ final class MainWindow {
     edit.setText(messages.text("action.edit"));
     delete.setText(messages.text("action.delete"));
     reload.setText(messages.text("action.reload"));
+    export.setText(messages.text("action.export"));
+    export.setId("export-yarns");
+    export.setMinWidth(Region.USE_PREF_SIZE);
+    export.setOnAction(event -> exportCollection());
     language.setText(messages.text("language.title"));
     language.setId("language-settings");
     language.setOnAction(
@@ -100,6 +118,7 @@ final class MainWindow {
     reload.setId("reload-yarns");
     this.stage = stage;
     this.service = service;
+    this.exports = exports;
     this.tasks = tasks;
     Label heading = new Label("GarnBox");
     heading.getStyleClass().add("app-heading");
@@ -130,7 +149,7 @@ final class MainWindow {
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     table.getColumns().add(column(messages.text("field.name"), Yarn::name, 360));
     table.getColumns().add(column(messages.text("field.brandShort"), Yarn::brand, 190));
-    table.getColumns().add(column(messages.text("field.color"), Yarn::color, 170));
+    table.getColumns().add(colorColumn());
     table.getColumns().add(column(messages.text("field.location"), Yarn::location, 240));
     table
         .getSelectionModel()
@@ -207,7 +226,7 @@ final class MainWindow {
     info.setId("app-info");
     info.setMinWidth(Region.USE_PREF_SIZE);
     language.setMinWidth(Region.USE_PREF_SIZE);
-    HBox footer = new HBox(16, status, info, language, reload);
+    HBox footer = new HBox(12, status, info, language, export, reload);
     footer.setAlignment(Pos.CENTER_LEFT);
     VBox details = new VBox(6, noteHeading, note);
     HBox.setHgrow(details, Priority.ALWAYS);
@@ -252,6 +271,49 @@ final class MainWindow {
     column.setCellValueFactory(cell -> new ReadOnlyStringWrapper(value.apply(cell.getValue())));
     column.setPrefWidth(width);
     column.setSortable(false);
+    return column;
+  }
+
+  private TableColumn<Yarn, String> colorColumn() {
+    TableColumn<Yarn, String> column = column(messages.text("field.color"), Yarn::color, 170);
+    column.setCellFactory(
+        ignored ->
+            new TableCell<>() {
+              private final Rectangle swatch = new Rectangle(22, 22);
+              private final Label code = new Label();
+              private final HBox content = new HBox(8, swatch, code);
+
+              {
+                swatch.setArcWidth(6);
+                swatch.setArcHeight(6);
+                swatch.setStroke(Color.web("#a7aaa3"));
+                content.setAlignment(Pos.CENTER_LEFT);
+                code.getStyleClass().add("color-code");
+              }
+
+              @Override
+              protected void updateItem(String value, boolean empty) {
+                super.updateItem(value, empty);
+                setText(null);
+                setGraphic(null);
+                setTooltip(null);
+                setAccessibleText(null);
+                if (empty || value == null) {
+                  return;
+                }
+                Color selected = YarnColors.parse(value);
+                String label = value.isEmpty() ? messages.text("color.none") : value;
+                setAccessibleText(messages.text("field.color") + ": " + label);
+                setTooltip(new Tooltip(label));
+                if (selected == null) {
+                  setText(value.isEmpty() ? "—" : value);
+                } else {
+                  swatch.setFill(selected);
+                  code.setText(value);
+                  setGraphic(content);
+                }
+              }
+            });
     return column;
   }
 
@@ -373,6 +435,44 @@ final class MainWindow {
     }
   }
 
+  private void exportCollection() {
+    if (busy || !ready || loadFailed || (editor != null && editor.isShowing())) {
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle(messages.text("export.title"));
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
+    chooser.setInitialFileName(
+        "yarn-box-"
+            + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
+            + ".json");
+    File selected = chooser.showSaveDialog(stage);
+    if (selected == null) {
+      return;
+    }
+    File target =
+        selected.getName().toLowerCase(Locale.ROOT).endsWith(".json")
+            ? selected
+            : new File(selected.getPath() + ".json");
+    setBusy(true);
+    showStatus(messages.text("export.busy"), false);
+    tasks.submit(
+        () -> exports.export(target.toPath()),
+        total -> {
+          setBusy(false);
+          showStatus(messages.text("export.saved", total, target.getName()), false);
+        },
+        failure -> {
+          setBusy(false);
+          showStatus(
+              messages.text(
+                  failure instanceof FileAlreadyExistsException
+                      ? "export.exists"
+                      : "export.failed"),
+              true);
+        });
+  }
+
   private void deleteSelected() {
     Yarn selected = table.getSelectionModel().getSelectedItem();
     if (selected == null || busy || loadFailed) {
@@ -413,6 +513,7 @@ final class MainWindow {
   }
 
   private void updateButtons() {
+    export.setDisable(busy || !ready || loadFailed);
     add.setDisable(busy || !ready || loadFailed);
     language.setDisable(busy || !ready || loadFailed);
     boolean unavailable = busy || loadFailed || table.getSelectionModel().getSelectedItem() == null;

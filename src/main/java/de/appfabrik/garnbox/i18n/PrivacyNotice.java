@@ -10,6 +10,8 @@ public final class PrivacyNotice {
         + messages.text("privacy.date")
         + "\n\n"
         + messages.text("privacy.body")
+        + "\n\n"
+        + messages.text("privacy.export")
         + "\n";
   }
 }
