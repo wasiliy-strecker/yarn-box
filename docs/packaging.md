@@ -19,7 +19,7 @@ Linux verwendet das app-eigene PNG-Icon, Windows das mehrstufige ICO.
 
 ```bash
 ./scripts/package.sh app-image
-./target/app-image/GarnBox/bin/GarnBox
+"./target/app-image/Yarn Box/bin/Yarn Box"
 ```
 
 Linux dient hier als Entwicklungs- und Prüfplattform. Ein App-Image ist ein
@@ -33,7 +33,7 @@ wird WiX Toolset 3.14.1 benötigt, dessen `bin`-Verzeichnis im `PATH` liegt.
 ```powershell
 .\mvnw.cmd verify
 .\scripts\package.ps1 -PackageType app-image
-.\target\app-image\GarnBox\GarnBox.exe
+& ".\target\app-image\Yarn Box\Yarn Box.exe"
 .\scripts\package.ps1 -PackageType exe
 ```
 
@@ -49,7 +49,7 @@ Auf der jeweiligen Mac-Architektur mit passendem Temurin-JDK 21.0.13+9 ausführe
 ```bash
 ./mvnw verify
 ./scripts/package.sh app-image
-open target/app-image/GarnBox.app
+open "target/app-image/Yarn Box.app"
 ./scripts/package.sh dmg
 ```
 

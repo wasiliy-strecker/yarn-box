@@ -1,4 +1,4 @@
-GarnBox bringt Ordnung in deine Garnsammlung. Erfasse Bezeichnung, Marke, Farbe, Aufbewahrungsort und persönliche Notizen. Ein optionales Foto hilft dir, das passende Garn wiederzuerkennen.
+Yarn Box bringt Ordnung in deine Garnsammlung. Erfasse Bezeichnung, Marke, Farbe, Aufbewahrungsort und persönliche Notizen. Ein optionales Foto hilft dir, das passende Garn wiederzuerkennen.
 
 Durchsuche alle fünf Textfelder, bearbeite Einträge und behalte deinen Vorrat im Blick. JPEG- und PNG-Fotos werden mit dem Eintrag gespeichert. Die Originaldateien bleiben unverändert.
 

@@ -1,6 +1,8 @@
 package de.appfabrik.garnbox.persistence;
 
 import de.appfabrik.garnbox.application.CollectionImportRepository;
+import de.appfabrik.garnbox.application.CollectionLimitException;
+import de.appfabrik.garnbox.application.CollectionLimits;
 import de.appfabrik.garnbox.application.ImportResult;
 import de.appfabrik.garnbox.application.PhotoException;
 import de.appfabrik.garnbox.application.PhotoImporter;
@@ -123,6 +125,12 @@ public final class SqliteYarnRepository implements YarnRepository, CollectionImp
       try {
         var available = new HashMap<String, Integer>();
         int[] counts = new int[2];
+        long originalCount;
+        try (var statement = connection.createStatement();
+            var result = statement.executeQuery("SELECT count(*) FROM yarns")) {
+          result.next();
+          originalCount = result.getLong(1);
+        }
         MessageDigest digest = sha256();
         try (var existing =
                 connection.prepareStatement(
@@ -133,6 +141,7 @@ public final class SqliteYarnRepository implements YarnRepository, CollectionImp
                     "INSERT INTO yarns (name, brand, color, location, note, photo) VALUES (?, ?, ?, ?, ?, ?)")) {
           source.read(
               draft -> {
+                CollectionLimits.validate(draft);
                 String key = fingerprint(draft, digest);
                 try {
                   Integer copies = available.get(key);
@@ -149,6 +158,9 @@ public final class SqliteYarnRepository implements YarnRepository, CollectionImp
                     available.put(key, copies - 1);
                     counts[1]++;
                   } else {
+                    if (originalCount + counts[0] >= CollectionLimits.MAX_ENTRIES) {
+                      throw new CollectionLimitException(CollectionLimitException.Code.ENTRIES);
+                    }
                     available.put(key, 0);
                     bind(insert, draft);
                     if (insert.executeUpdate() != 1) {
@@ -219,14 +231,17 @@ public final class SqliteYarnRepository implements YarnRepository, CollectionImp
 
   @Override
   public Yarn create(YarnDraft draft) {
+    CollectionLimits.validate(draft);
     try (Connection connection = connect();
         PreparedStatement statement =
             connection.prepareStatement(
-                "INSERT INTO yarns (name, brand, color, location, note, photo) VALUES (?, ?, ?, ?, ?, ?) RETURNING id")) {
+                "INSERT INTO yarns (name, brand, color, location, note, photo)"
+                    + " SELECT ?, ?, ?, ?, ?, ? WHERE (SELECT count(*) FROM yarns) < ? RETURNING id")) {
       bind(statement, draft);
+      statement.setInt(7, CollectionLimits.MAX_ENTRIES);
       try (ResultSet result = statement.executeQuery()) {
         if (!result.next()) {
-          throw new StorageException(StorageException.Code.CREATE);
+          throw new CollectionLimitException(CollectionLimitException.Code.ENTRIES);
         }
         return draft.withId(result.getLong(1));
       }
@@ -237,6 +252,7 @@ public final class SqliteYarnRepository implements YarnRepository, CollectionImp
 
   @Override
   public Yarn update(long id, YarnDraft draft) {
+    CollectionLimits.validate(draft);
     try (Connection connection = connect();
         PreparedStatement statement =
             connection.prepareStatement(

@@ -1,4 +1,4 @@
-GarnBox helps you organize your yarn collection. Record a name, brand, color, storage location, and personal notes. Add one optional photo to recognize the yarn you need.
+Yarn Box helps you organize your yarn collection. Record a name, brand, color, storage location, and personal notes. Add one optional photo to recognize the yarn you need.
 
 Search all five text fields, edit entries, and browse your collection. JPEG and PNG photos are saved with each entry. Your original image files stay unchanged.
 

@@ -1,4 +1,4 @@
-GarnBox ajuda você a organizar sua coleção de fios. Registre nome, marca, cor, local de armazenamento e notas pessoais. Adicione uma foto opcional para reconhecer o fio que procura.
+Yarn Box ajuda você a organizar sua coleção de fios. Registre nome, marca, cor, local de armazenamento e notas pessoais. Adicione uma foto opcional para reconhecer o fio que procura.
 
 Pesquise nos cinco campos de texto, edite os registros e consulte sua coleção. As fotos JPEG e PNG são salvas com cada registro. Os arquivos originais não são alterados.
 

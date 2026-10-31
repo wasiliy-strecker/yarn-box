@@ -17,8 +17,10 @@ class LanguagePreferencesTest {
   @TempDir Path directory;
 
   @Test
-  void absentPreferencesFollowSystemWithoutCreatingFiles() throws Exception {
-    assertEquals("auto", new LanguagePreferences(directory).load());
+  void absentPreferencesStartInEnglishEvenOnGermanSystemsWithoutCreatingFiles() throws Exception {
+    String choice = new LanguagePreferences(directory).load();
+    assertEquals("en-US", choice);
+    assertEquals(AppLanguage.ENGLISH, AppLanguage.resolve(choice, java.util.Locale.GERMANY));
     assertFalse(Files.exists(directory.resolve("language.txt")));
   }
 

@@ -1,20 +1,25 @@
 # Internationalisierung und Linux-Vorschau
 
-GarnBox unterstützt de-DE, en-US, es-ES, fr-FR, it-IT und pt-BR. Der Umfang bleibt
+Yarn Box unterstützt de-DE, en-US, es-ES, fr-FR, it-IT und pt-BR. Der Umfang bleibt
 Stufe 2 mit fünf Textfeldern und genau einem optionalen Foto pro Eintrag.
-Produktname, App-Kennung, Datenpfade und SQLite-Schema bleiben erhalten.
+Der öffentliche Produktname ist in jeder Sprache Yarn Box. App-Kennung,
+Datenpfade und SQLite-Schema bleiben erhalten.
 
 ## Sprachwahl und Daten
+
+Ohne gespeicherte Sprachwahl startet die App auf Englisch. Die deutsche
+Store-Erstveröffentlichung bestimmt ausschließlich die Store-Texte und Release-
+Hinweise. Vorhandene Sprachwahlen werden erhalten.
 
 Die Schaltfläche „Sprache“ bietet die sechs Sprachen und die automatische Wahl
 nach Systemsprache. Die Einstellung steht in `language.txt` neben `garnbox.db`
 und wird beim nächsten Start angewandt. Nicht unterstützte Sprachen und
 unbekannte gespeicherte Werte verwenden Englisch. Ein Lesefehler verwendet die
-Systemsprache und zeigt einen übersetzten Hinweis. Fehler beim Speichern lassen
+englische Sprache und zeigt einen Hinweis. Fehler beim Speichern lassen
 den Dialog mit seiner Auswahl offen. Der Austausch der Einstellungsdatei ist
 atomar. Die Datenbank wird dabei nicht geändert.
 
-Die sechs UTF-8-Kataloge enthalten jeweils 91 Schlüssel. Eigene Dialoge,
+Die sechs UTF-8-Kataloge werden auf vollständige, passende Schlüssel geprüft. Eigene Dialoge,
 Validierungen, Foto- und Speicherfehler, Mengenangaben und Text-Kontextmenüs
 werden übersetzt. Die Sortierung verwendet die gewählte Sprache. Namen, Notizen
 und Foto-BLOBs werden unverändert gespeichert. Titel und Dateifilter der nativen
@@ -40,6 +45,9 @@ python3 scripts/store_assets/run_gui.py --output target/gui-international
 Für gezielte Entwicklung sind `--locales fr-FR` und `--mode capture` oder
 `--mode verify` verfügbar. Eine Lieferung benötigt alle sechs Sprachen und den
 Standardmodus `all`. Der Ausgabeordner muss neu sein.
+
+`--mode startup --locales en-US` prüft separat einen Erststart ohne Sprachdatei
+auf einem simulierten deutschen System. Die Oberfläche muss Englisch verwenden.
 
 Je Sprache startet `GuiJourney` die produktive `YarnsApplication` in drei neuen
 JVM-Prozessen. Die Bedienung erfolgt mit echten Maus- und Tastaturereignissen.
@@ -68,7 +76,7 @@ der expliziten Wahl.
 python3 scripts/store_assets/packaged_smoke.py --output target/packaged-international
 ```
 
-Zusätzlich werden ImageMagick und `xsel` benötigt. Der echte Launcher startet
+Zusätzlich werden ImageMagick, `xsel` und Python Pillow benötigt. Der echte Launcher startet
 außerhalb des Projekts mit eigener JVM, entferntem `JAVA_HOME` und
 `PATH=/nonexistent`. Eine vorhandene synthetische Schema-1-Sammlung enthält
 1234 Einträge. Der Ablauf prüft französischen Start, Unicode-Bearbeitung, die

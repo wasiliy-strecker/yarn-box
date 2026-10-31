@@ -1,5 +1,6 @@
 package de.appfabrik.garnbox.ui;
 
+import de.appfabrik.garnbox.application.CollectionLimitException;
 import de.appfabrik.garnbox.application.PhotoException;
 import de.appfabrik.garnbox.application.StorageException;
 import de.appfabrik.garnbox.i18n.Messages;
@@ -31,6 +32,9 @@ final class UiSupport {
   }
 
   static String message(Throwable failure, Messages messages) {
+    if (failure instanceof CollectionLimitException limit) {
+      return messages.text("limit." + limit.code().name());
+    }
     return failure instanceof StorageException
         ? messages.text("storage." + ((StorageException) failure).code().name())
         : failure instanceof PhotoException photo

@@ -60,7 +60,8 @@ public final class GuiJourney {
           "An isolated, explicitly marked synthetic data directory is required");
     }
     Files.createDirectories(output);
-    AppLanguage language = AppLanguage.resolve(tag, Locale.US);
+    AppLanguage language =
+        mode.equals("startup") ? AppLanguage.ENGLISH : AppLanguage.resolve(tag, Locale.US);
     Messages messages = new Messages(language);
     Properties demo = new Properties();
     try (var reader =
@@ -87,10 +88,12 @@ public final class GuiJourney {
                     : new Photo(
                         Files.readAllBytes(Path.of(demo.getProperty("yarn." + i + ".photo"))))));
       }
-      new LanguagePreferences(data).save(tag);
+      if (!mode.equals("startup")) {
+        new LanguagePreferences(data).save(tag);
+      }
     }
     // A deliberately different system language proves the saved preference wins at real startup.
-    Locale.setDefault(Locale.JAPAN);
+    Locale.setDefault(mode.equals("startup") ? Locale.GERMANY : Locale.JAPAN);
     Thread driver =
         new Thread(
             () -> {
@@ -101,7 +104,15 @@ public final class GuiJourney {
                     fx(() -> ((Button) find("add-yarn")).getText())
                         .equals("+  " + messages.text("yarn.add")),
                     "saved language applied at startup");
-                if (mode.equals("capture")) {
+                if (mode.equals("startup")) {
+                  check(
+                      !Files.exists(data.resolve("language.txt")),
+                      "first start does not write a language choice");
+                  check(
+                      new LanguagePreferences(data).load().equals("en-US"),
+                      "first start uses English on a German system");
+                  screenshot(output.resolve("startup.png"));
+                } else if (mode.equals("capture")) {
                   captureJourney(output, messages, demo);
                 } else if (mode.equals("verify")) {
                   verifyJourney(data, output, messages);
@@ -127,12 +138,26 @@ public final class GuiJourney {
                           new SqliteYarnRepository(data.resolve("garnbox.db"))
                               .findPhoto(saved.id())
                               .bytes(),
-                          Files.readAllBytes(Path.of("assets/store_demo/images/sage.png"))),
+                          de.appfabrik.garnbox.application.PhotoImporter.read(
+                                  Path.of("assets/store_demo/images/sage.png"))
+                              .bytes()),
                       "photo bytes survive language change and restart");
                   enter("search-yarns", "ÁLVARO");
                   waitFor(() -> ((TableView<?>) find("yarns-table")).getItems().size() == 1);
                   clickTableFirstRow();
                   waitFor(() -> photoVisible("selected-photo"));
+                  check(
+                      fx(
+                          () ->
+                              find("yarns-table").lookupAll(".color-code").stream()
+                                  .filter(
+                                      node ->
+                                          node instanceof Label label && !label.getText().isEmpty())
+                                  .allMatch(
+                                      node ->
+                                          javafx.scene.paint.Color.web("#253c34")
+                                              .equals(((Label) node).getTextFill()))),
+                      "selected color code keeps dark readable text");
                   screenshot(output.resolve("restart.png"));
                 } else {
                   throw new IllegalArgumentException("Unknown mode");
@@ -231,7 +256,20 @@ public final class GuiJourney {
     String title = "L'été d'Álvaro – ação – Bücher";
     enter("yarn-name", title);
     enter("yarn-brand", "Élise O'Connor");
-    enter("yarn-color", "Sauge · Salbeigrün");
+    click("yarn-color");
+    fx(
+        () -> {
+          Bounds bounds = find("yarn-color").localToScreen(find("yarn-color").getBoundsInLocal());
+          Robot robot = new Robot();
+          robot.mouseMove(bounds.getMinX() + 60, bounds.getMaxY() + 68);
+          robot.mouseClick(MouseButton.PRIMARY);
+          return null;
+        });
+    pause();
+    check(
+        fx(() -> ((javafx.scene.control.ColorPicker) find("yarn-color")).getValue().getOpacity())
+            > 0,
+        "actual palette selection");
     enter("yarn-location", "São Paulo · étagère 12");
     enter(
         "yarn-note",
@@ -315,7 +353,9 @@ public final class GuiJourney {
     check(
         Arrays.equals(
             repository.findPhoto(savedId).bytes(),
-            Files.readAllBytes(Path.of("assets/store_demo/images/lilac.jpg"))),
+            de.appfabrik.garnbox.application.PhotoImporter.read(
+                    Path.of("assets/store_demo/images/lilac.jpg"))
+                .bytes()),
         "JPEG replacement saved atomically with text after retry");
     click("edit-yarn");
     waitFor(() -> find("remove-photo") != null && !find("remove-photo").isDisabled());
@@ -345,7 +385,9 @@ public final class GuiJourney {
     check(
         Arrays.equals(
             repository.findPhoto(savedId).bytes(),
-            Files.readAllBytes(Path.of("assets/store_demo/images/sage.png"))),
+            de.appfabrik.garnbox.application.PhotoImporter.read(
+                    Path.of("assets/store_demo/images/sage.png"))
+                .bytes()),
         "new PNG saved after removal");
     click("clear-search");
     click("language-settings");

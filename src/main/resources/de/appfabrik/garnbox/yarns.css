@@ -55,4 +55,4 @@
 .yarn-color-picker:focused { -fx-border-color: #6d5279; }
 .color-clear { -fx-padding: 7px 11px; -fx-font-size: 18px; }
 .color-clear:focused { -fx-padding: 5px 9px; }
-.color-code { -fx-font-family: "Monospaced"; -fx-font-size: 12px; }
+.color-code { -fx-font-family: "Monospaced"; -fx-font-size: 12px; -fx-text-fill: #253c34; }

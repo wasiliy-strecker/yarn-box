@@ -2,6 +2,7 @@ package de.appfabrik.garnbox.ui;
 
 import de.appfabrik.garnbox.application.CollectionExport;
 import de.appfabrik.garnbox.application.CollectionImport;
+import de.appfabrik.garnbox.application.CollectionLimitException;
 import de.appfabrik.garnbox.application.ImportException;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Yarn;
@@ -131,7 +132,7 @@ final class MainWindow {
     this.exports = exports;
     this.imports = imports;
     this.tasks = tasks;
-    Label heading = new Label("GarnBox");
+    Label heading = new Label("Yarn Box");
     heading.getStyleClass().add("app-heading");
     Label subname = new Label(messages.text("app.subtitle"));
     subname.getStyleClass().add("muted");
@@ -257,7 +258,7 @@ final class MainWindow {
               search.requestFocus();
               search.selectAll();
             });
-    stage.setTitle("GarnBox");
+    stage.setTitle("Yarn Box");
     UiSupport.icon(stage);
     stage.setMinWidth(860);
     stage.setMinHeight(700);
@@ -474,10 +475,12 @@ final class MainWindow {
         failure -> {
           setBusy(false);
           showStatus(
-              messages.text(
-                  failure instanceof FileAlreadyExistsException
-                      ? "export.exists"
-                      : "export.failed"),
+              failure instanceof CollectionLimitException
+                  ? UiSupport.message(failure, messages)
+                  : messages.text(
+                      failure instanceof FileAlreadyExistsException
+                          ? "export.exists"
+                          : "export.failed"),
               true);
         });
   }
@@ -508,10 +511,12 @@ final class MainWindow {
         failure -> {
           setBusy(false);
           showStatus(
-              messages.text(
-                  failure instanceof ImportException problem
-                      ? "import.error." + problem.code().name()
-                      : "import.failed"),
+              failure instanceof CollectionLimitException
+                  ? UiSupport.message(failure, messages)
+                  : messages.text(
+                      failure instanceof ImportException problem
+                          ? "import.error." + problem.code().name()
+                          : "import.failed"),
               true);
         });
   }

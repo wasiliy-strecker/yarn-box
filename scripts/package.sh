@@ -25,9 +25,10 @@ VERSION=$(./mvnw --quiet -Dstyle.color=never help:evaluate -Dexpression=project.
 INPUT="$ROOT/target/package-input"
 MODULES="$ROOT/target/javafx-modules"
 IMAGE_DEST="$ROOT/target/app-image"
+APP_NAME='Yarn Box'
 DIST="$ROOT/target/dist"
 # These are generated staging directories only. User data never lives here.
-rm -rf "$INPUT" "$MODULES" "$IMAGE_DEST"
+rm -rf "$INPUT" "$MODULES" "$IMAGE_DEST/$APP_NAME" "$IMAGE_DEST/$APP_NAME.app"
 mkdir -p "$INPUT/legal" "$MODULES" "$IMAGE_DEST" "$DIST"
 ./mvnw --batch-mode --no-transfer-progress dependency:copy-dependencies \
   -DincludeScope=runtime -DoutputDirectory="$INPUT"
@@ -44,9 +45,8 @@ for library in "$INPUT"/javafx-*.jar; do
     *) rm "$library" ;;
   esac
 done
-APP_NAME=GarnBox
 common=(--name "$APP_NAME" --app-version "$VERSION" --vendor "Wasiliy Strecker"
-  --description "GarnBox – deine lokale Garnsammlung"
+  --description "Yarn Box – deine lokale Garnsammlung"
   --input "$INPUT" --main-jar "garnbox-$VERSION.jar"
   --main-class de.appfabrik.garnbox.Launcher
   --module-path "$JAVA_HOME/jmods:$MODULES"
@@ -57,7 +57,7 @@ if [[ "$(uname -s)" == Linux ]]; then
   common+=(--icon "$ROOT/assets/branding/icon-256.png")
 fi
 if [[ "$(uname -s)" == Darwin ]]; then
-  common+=(--icon "$ROOT/assets/branding/icon.icns" --mac-package-identifier de.appfabrik.garnbox --mac-package-name GarnBox)
+  common+=(--icon "$ROOT/assets/branding/icon.icns" --mac-package-identifier de.appfabrik.garnbox --mac-package-name "$APP_NAME")
 fi
 "$JAVA_HOME/bin/jpackage" "${common[@]}" --type app-image --dest "$IMAGE_DEST"
 if [[ "$(uname -s)" == Darwin ]]; then
@@ -76,7 +76,7 @@ if [[ "$PLATFORM" == linux ]]; then
   cp "$ROOT/scripts/install_desktop.py" "$APP_IMAGE/"
 fi
 ACTUAL_VERSION=$("$LAUNCHER" --version)
-if [[ "$ACTUAL_VERSION" != "GarnBox $VERSION" ]]; then
+if [[ "$ACTUAL_VERSION" != "Yarn Box $VERSION" ]]; then
   printf 'Versionsprüfung des paketierten Launchers fehlgeschlagen.\n' >&2
   exit 1
 fi

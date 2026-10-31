@@ -5,16 +5,22 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
 import de.appfabrik.garnbox.application.CollectionFile;
+import de.appfabrik.garnbox.application.CollectionLimitException;
+import de.appfabrik.garnbox.application.CollectionLimits;
 import de.appfabrik.garnbox.application.ImportException;
 import de.appfabrik.garnbox.application.PhotoException;
 import de.appfabrik.garnbox.application.PhotoImporter;
 import de.appfabrik.garnbox.domain.Photo;
 import de.appfabrik.garnbox.domain.YarnDraft;
+import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
@@ -32,11 +38,20 @@ import java.util.function.Consumer;
 
 /** Versioned UTF-8 JSON, including selected colors and exact stored photo bytes. */
 public final class JsonCollectionFile implements CollectionFile {
-  private static final long MAX_IMPORT_BYTES = 256L * 1024 * 1024;
-  private static final int MAX_ENTRIES = 10_000;
-  private static final int MAX_TEXT_LENGTH = 1_048_576;
+  private final long maxFileBytes;
   private static final Set<String> ENTRY_FIELDS =
       Set.of("name", "brand", "color", "location", "note", "photoBase64");
+
+  public JsonCollectionFile() {
+    this(CollectionLimits.MAX_FILE_BYTES);
+  }
+
+  JsonCollectionFile(long maxFileBytes) {
+    if (maxFileBytes < 1 || maxFileBytes > CollectionLimits.MAX_FILE_BYTES) {
+      throw new IllegalArgumentException("Invalid collection file budget");
+    }
+    this.maxFileBytes = maxFileBytes;
+  }
 
   @Override
   public void read(Path source, Consumer<YarnDraft> accept) {
@@ -44,7 +59,7 @@ public final class JsonCollectionFile implements CollectionFile {
       if (!Files.isRegularFile(source)) {
         throw new ImportException(ImportException.Code.READ);
       }
-      if (Files.size(source) > MAX_IMPORT_BYTES) {
+      if (Files.size(source) > maxFileBytes) {
         throw new ImportException(ImportException.Code.LIMIT);
       }
       var decoder =
@@ -52,7 +67,7 @@ public final class JsonCollectionFile implements CollectionFile {
               .newDecoder()
               .onMalformedInput(CodingErrorAction.REPORT)
               .onUnmappableCharacter(CodingErrorAction.REPORT);
-      try (var input = new LimitedInput(Files.newInputStream(source));
+      try (var input = new LimitedInput(Files.newInputStream(source), maxFileBytes);
           var reader = new JsonReader(new InputStreamReader(input, decoder))) {
         reader.setStrictness(Strictness.STRICT);
         reader.beginObject();
@@ -90,7 +105,7 @@ public final class JsonCollectionFile implements CollectionFile {
     reader.beginArray();
     int count = 0;
     while (reader.hasNext()) {
-      if (++count > MAX_ENTRIES) {
+      if (++count > CollectionLimits.MAX_ENTRIES) {
         throw new ImportException(ImportException.Code.LIMIT);
       }
       reader.beginObject();
@@ -123,7 +138,7 @@ public final class JsonCollectionFile implements CollectionFile {
   private static String readText(JsonReader reader) throws IOException {
     require(reader.peek() == JsonToken.STRING);
     String value = reader.nextString();
-    if (value.length() > MAX_TEXT_LENGTH) {
+    if (value.length() > CollectionLimits.MAX_TEXT_LENGTH) {
       throw new ImportException(ImportException.Code.LIMIT);
     }
     for (int i = 0; i < value.length(); i++) {
@@ -162,9 +177,11 @@ public final class JsonCollectionFile implements CollectionFile {
 
   private static final class LimitedInput extends FilterInputStream {
     private long count;
+    private final long limit;
 
-    private LimitedInput(InputStream input) {
+    private LimitedInput(InputStream input, long limit) {
       super(input);
+      this.limit = limit;
     }
 
     @Override
@@ -178,7 +195,7 @@ public final class JsonCollectionFile implements CollectionFile {
 
     @Override
     public int read(byte[] bytes, int offset, int length) throws IOException {
-      int result = in.read(bytes, offset, (int) Math.min(length, MAX_IMPORT_BYTES - count + 1));
+      int result = in.read(bytes, offset, (int) Math.min(length, limit - count + 1));
       if (result > 0) {
         reserve(result);
       }
@@ -187,9 +204,38 @@ public final class JsonCollectionFile implements CollectionFile {
 
     private void reserve(int bytes) {
       count += bytes;
-      if (count > MAX_IMPORT_BYTES) {
+      if (count > limit) {
         throw new ImportException(ImportException.Code.LIMIT);
       }
+    }
+  }
+
+  private static final class LimitedOutput extends FilterOutputStream {
+    private final long limit;
+    private long count;
+
+    private LimitedOutput(OutputStream output, long limit) {
+      super(output);
+      this.limit = limit;
+    }
+
+    @Override
+    public void write(int value) throws IOException {
+      reserve(1);
+      out.write(value);
+    }
+
+    @Override
+    public void write(byte[] bytes, int offset, int length) throws IOException {
+      reserve(length);
+      out.write(bytes, offset, length);
+    }
+
+    private void reserve(int length) {
+      if (length > limit - count) {
+        throw new CollectionLimitException(CollectionLimitException.Code.FILE_SIZE);
+      }
+      count += length;
     }
   }
 
@@ -208,11 +254,17 @@ public final class JsonCollectionFile implements CollectionFile {
     }
     Path temporary = Files.createTempFile(parent, ".yarn-box-", ".json.tmp");
     try {
-      try (var writer = Files.newBufferedWriter(temporary, StandardCharsets.UTF_8)) {
+      try (var output = new LimitedOutput(Files.newOutputStream(temporary), maxFileBytes);
+          var writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
         writer.write(
             "{\n  \"format\": \"yarn-box.collection\",\n  \"version\": 1,\n  \"yarns\": [");
         boolean first = true;
+        int count = 0;
         for (YarnDraft yarn : yarns) {
+          if (++count > CollectionLimits.MAX_ENTRIES) {
+            throw new CollectionLimitException(CollectionLimitException.Code.ENTRIES);
+          }
+          CollectionLimits.validate(yarn);
           writer.write(first ? "\n" : ",\n");
           first = false;
           writer.write("    {\n      \"name\": ");
@@ -229,7 +281,9 @@ public final class JsonCollectionFile implements CollectionFile {
           if (yarn.photo() == null) {
             writer.write("null");
           } else {
-            string(writer, Base64.getEncoder().encodeToString(yarn.photo().bytes()));
+            byte[] photo = yarn.photo().bytes();
+            PhotoImporter.decode(photo);
+            string(writer, Base64.getEncoder().encodeToString(photo));
           }
           writer.write("\n    }");
         }

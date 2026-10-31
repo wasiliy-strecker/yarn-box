@@ -1,12 +1,12 @@
-# GarnBox
+# Yarn Box
 
 Deine Garne an einem Ort. Erfasse Bezeichnung, Marke oder Hersteller, Farbe,
 Aufbewahrungsort und eine mehrzeilige Notiz. Ein optionales Foto hilft beim
 Wiedererkennen. Alles bleibt lokal und nach einem Neustart erhalten.
 
-![GarnBox mit synthetischen Testdaten](docs/screenshots/garnbox.png)
+![Yarn Box mit synthetischen Testdaten](docs/screenshots/garnbox.png)
 
-GarnBox ist Stufe 2 der Java-Reihe nach BücherRegal. Neu ist genau ein Foto pro
+Yarn Box ist Stufe 2 der Java-Reihe nach Bookshelf. Neu ist genau ein Foto pro
 Eintrag. Status, Checklisten, Mengenverwaltung, PDF und Cloud gehören nicht dazu.
 
 ## Starten
@@ -40,7 +40,7 @@ bei fehlendem `JAVA_HOME` auch das JDK unter `$HOME/.local/share/garnbox/jdk-21.
 Das gebaute Linux-App-Image startet ohne separat installiertes Java:
 
 ```bash
-./target/app-image/GarnBox/bin/GarnBox
+"./target/app-image/Yarn Box/bin/Yarn Box"
 ```
 
 ## Bedienung
@@ -103,8 +103,10 @@ erst nach vollständigem Schreiben veröffentlicht. Die Datei ist unverschlüsse
 
 „Importieren“ steht direkt neben „Exportieren“. Wähle einen zuvor erzeugten
 Yarn-Box-Export. Die App ergänzt die Einträge einschließlich Farben, Notizen
-und Fotos in der vorhandenen Sammlung. Vorhandene Einträge werden nicht
-überschrieben. Bereits vorhandene identische Kopien werden übersprungen.
+und Fotos in der vorhandenen Sammlung. Insgesamt sind höchstens 10.000 Einträge
+erlaubt. Würde ein Import diese Grenze überschreiten, wird er vollständig
+abgebrochen. Bereits vorhandene identische Kopien zählen nicht als neue Einträge
+und werden übersprungen. Vorhandene Einträge werden nicht überschrieben.
 Gleichnamige Einträge mit anderen Inhalten bleiben eigenständig. Enthält der
 Export mehrere identische Einträge, bleibt ihre Anzahl beim Wiederherstellen
 erhalten. Ein wiederholter Import derselben Datei erzeugt keine weiteren Kopien.
@@ -116,6 +118,22 @@ Quelldatei bleiben dabei unverändert. Importgrenzen sind 256 MiB je JSON-Datei,
 10.000 Einträge und 1.048.576 Zeichen je Textfeld. Für Fotos gelten dieselben
 Größen- und Formatgrenzen wie bei der Fotoauswahl. Sprache und gemerkter
 Fotoordner werden nicht importiert.
+
+Beim Hinzufügen gilt ebenfalls die Grenze von 10.000 Einträgen. Du kannst
+bei voller Sammlung weiter bearbeiten und löschen. Neue und bearbeitete
+Textfelder sind auf 1.048.576 Zeichen begrenzt. Bestehende größere Altbestände
+werden nicht gelöscht oder automatisch gekürzt.
+
+Der Export prüft dieselben Grenzen wie der Import. Er meldet Erfolg erst,
+wenn eine vollständige, wieder importierbare Datei vorliegt. Überschreitet
+sie 256 MiB oder enthält ein Altbestand zu viele Einträge oder zu lange Texte,
+zeigt die App eine Erklärung und erstellt keine Exportdatei. Vorhandene Dateien
+bleiben erhalten. Für eine vollständige Sicherung großer Sammlungen die App
+schließen und die Datei `garnbox.db` kopieren.
+
+Die erste Store-Veröffentlichung verwendet deutsche Beschreibungen, Bildtexte
+und Release-Hinweise. Diese Release-Sprache ist unabhängig von der englischen
+App-Standardsprache und der persönlichen Sprachwahl.
 
 ## Tastenkürzel
 
@@ -132,9 +150,10 @@ Fotoordner werden nicht importiert.
 
 ## Sprachen und Store-Vorschau
 
+Neue Installationen starten auf Englisch, unabhängig von der Systemsprache.
 Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch
-und Portugiesisch (Brasilien) verfügbar. Über „Sprache“ eine feste Sprache oder
-die Systemsprache wählen und GarnBox neu starten. Die Wahl steht in
+und Portugiesisch (Brasilien) verfügbar. Gespeicherte Sprachwahlen bleiben erhalten. Über „Sprache“ eine feste Sprache oder
+die Systemsprache wählen und Yarn Box neu starten. Die Wahl steht in
 `language.txt` im Datenordner. Garne und Fotos bleiben dabei unverändert.
 Nicht unterstützte Sprachen verwenden Englisch.
 
@@ -186,7 +205,7 @@ Isolierter Teststart ohne Zugriff auf die normale Sammlung:
 
 ```bash
 ./scripts/run.sh '-Djavafx.args=--data-dir=/tmp/garnbox-test'
-./target/app-image/GarnBox/bin/GarnBox --data-dir=/tmp/garnbox-test
+"./target/app-image/Yarn Box/bin/Yarn Box" --data-dir=/tmp/garnbox-test
 ```
 
 ```bash
@@ -219,7 +238,7 @@ Anwendungseintrag demselben Icon zu.
 Nach dem Linux-App-Image-Bau aus diesem App-Verzeichnis registrieren:
 
 ```bash
-python3 target/app-image/GarnBox/install_desktop.py
+python3 "target/app-image/Yarn Box/install_desktop.py"
 ```
 
 Danach lässt sich die App über ihren Namen in der Ubuntu-Anwendungsübersicht

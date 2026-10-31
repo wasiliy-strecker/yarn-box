@@ -1,4 +1,4 @@
-GarnBox vous aide à organiser votre collection de fils. Enregistrez le nom, la marque, la couleur, l’emplacement et vos notes. Ajoutez une photo facultative pour reconnaître le fil recherché.
+Yarn Box vous aide à organiser votre collection de fils. Enregistrez le nom, la marque, la couleur, l’emplacement et vos notes. Ajoutez une photo facultative pour reconnaître le fil recherché.
 
 Recherchez dans les cinq champs de texte, modifiez les fiches et parcourez votre collection. Les photos JPEG et PNG sont enregistrées avec chaque fiche. Les fichiers d’origine restent inchangés.
 

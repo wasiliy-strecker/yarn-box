@@ -20,7 +20,7 @@ try {
     $ImageDestination = Join-Path $Root "target\app-image"
     $Distribution = Join-Path $Root "target\dist"
     # Only generated staging paths are removed, never the user's collection.
-    foreach ($GeneratedPath in @($InputDirectory, $Modules, $ImageDestination)) {
+    foreach ($GeneratedPath in @($InputDirectory, $Modules, (Join-Path $ImageDestination "Yarn Box"))) {
         if (Test-Path $GeneratedPath) { Remove-Item $GeneratedPath -Recurse -Force }
     }
     New-Item "$InputDirectory\legal", $Modules, $ImageDestination, $Distribution -ItemType Directory -Force | Out-Null
@@ -37,8 +37,8 @@ try {
         else { Remove-Item $_.FullName }
     }
     $Common = @(
-        "--name", "GarnBox", "--app-version", $Version,
-        "--vendor", "Wasiliy Strecker", "--description", "GarnBox - deine lokale Garnsammlung",
+        "--name", "Yarn Box", "--app-version", $Version,
+        "--vendor", "Wasiliy Strecker", "--description", "Yarn Box - deine lokale Garnsammlung",
         "--input", $InputDirectory, "--main-jar", "garnbox-$Version.jar",
         "--main-class", "de.appfabrik.garnbox.Launcher",
         "--icon", (Join-Path $Root "assets\branding\icon.ico"),
@@ -49,23 +49,23 @@ try {
     )
     & "$env:JAVA_HOME\bin\jpackage.exe" @Common --type app-image --dest $ImageDestination
     if ($LASTEXITCODE -ne 0) { throw "App-Image konnte nicht gebaut werden." }
-    $AppImage = Join-Path $ImageDestination "GarnBox"
-    $Launcher = Join-Path $AppImage "GarnBox.exe"
+    $AppImage = Join-Path $ImageDestination "Yarn Box"
+    $Launcher = Join-Path $AppImage "Yarn Box.exe"
     # GUI launchers on Windows do not reliably expose stdout. Wait for the process.
     $Check = Start-Process -FilePath $Launcher -ArgumentList "--version" -Wait -PassThru
     if ($Check.ExitCode -ne 0) { throw "Paketierter Launcher ist fehlgeschlagen." }
     if ($PackageType -eq "exe") {
         $Staging = Join-Path $Root "target\installer-staging"
         if (Test-Path $Staging) { Remove-Item $Staging -Recurse -Force }
-        & "$env:JAVA_HOME\bin\jpackage.exe" --type exe --name GarnBox `
+        & "$env:JAVA_HOME\bin\jpackage.exe" --type exe --name "Yarn Box" `
             --app-image $AppImage --app-version $Version --vendor "Wasiliy Strecker" `
             --icon "$Root\assets\branding\icon.ico" `
             --dest $Staging --win-per-user-install --win-menu --win-shortcut `
-            --win-menu-group "GarnBox" --win-upgrade-uuid "18ae9414-4e23-48f8-bc2e-376a9bc8957c"
+            --win-menu-group "Yarn Box" --win-upgrade-uuid "18ae9414-4e23-48f8-bc2e-376a9bc8957c"
         if ($LASTEXITCODE -ne 0) { throw "EXE-Paket fehlgeschlagen. Für JDK 21 wird WiX 3 benötigt." }
         $Output = Join-Path $Distribution "garnbox-$Version-windows-x64.exe"
         if (Test-Path $Output) { throw "Vorhandenes Paket wird nicht überschrieben: $Output" }
-        Move-Item "$Staging\GarnBox-$Version.exe" $Output
+        Move-Item "$Staging\Yarn Box-$Version.exe" $Output
         Write-Host "EXE erstellt, native Abnahme separat durchführen: $Output"
     }
     Write-Host "App-Image erstellt und Launcher gestartet: $AppImage"

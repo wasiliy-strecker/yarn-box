@@ -1,4 +1,4 @@
-GarnBox te ayuda a organizar tu colección de hilos. Guarda el nombre, la marca, el color, la ubicación y tus notas. Añade una foto opcional para reconocer el hilo que necesitas.
+Yarn Box te ayuda a organizar tu colección de hilos. Guarda el nombre, la marca, el color, la ubicación y tus notas. Añade una foto opcional para reconocer el hilo que necesitas.
 
 Busca en los cinco campos de texto, edita las entradas y consulta tu colección. Las fotos JPEG y PNG se guardan con cada entrada. Los archivos originales no se modifican.
 

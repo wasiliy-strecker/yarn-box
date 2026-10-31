@@ -1,6 +1,6 @@
 # Architektur und Bewerbungsgespräch
 
-GarnBox hat ein Maven-Modul und fünf kleine Bereiche. Die bewährten Muster von
+Yarn Box hat ein Maven-Modul und fünf kleine Bereiche. Die bewährten Muster von
 BücherRegal wurden gezielt angepasst. Es gibt weder eine gemeinsame Bibliothek
 noch eine Runtime-Abhängigkeit zwischen den beiden Apps.
 
@@ -78,7 +78,7 @@ Eine geschlossene Datenbankdatei genügt für eine manuelle Sicherung.
 Separate Dateien könnten bei sehr großen Bildsammlungen sinnvoll sein, würden
 hier aber temporäre Dateien, Fehlerbehandlung zwischen Dateisystem und Datenbank
 sowie eine sichere Bereinigung verlangen. Diesen zusätzlichen Lebenszyklus
-vermeidet GarnBox bewusst. SQLite kann nach dem Entfernen von Bildern freien
+vermeidet Yarn Box bewusst. SQLite kann nach dem Entfernen von Bildern freien
 Platz innerhalb der Datei behalten. Es wird keine automatische VACUUM-Funktion
 oder sichere physische Datenlöschung versprochen.
 
@@ -131,7 +131,7 @@ oder löscht die ausgewählte Quelldatei.
 
 ## Java-Kenntnisse gegenüber BücherRegal
 
-| Bereits in BücherRegal | Konkret neu in GarnBox |
+| Bereits in BücherRegal | Konkret neu in Yarn Box |
 | --- | --- |
 | Records für Texte, stabile numerische IDs | Unveränderliche Byte-Werteklasse mit defensiven Kopien und inhaltsbasiertem `equals`/`hashCode` |
 | JDBC für Textfelder | Nullable BLOBs und gemeinsame atomare Änderung von Text und Bild |

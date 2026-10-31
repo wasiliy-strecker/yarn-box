@@ -1,7 +1,7 @@
-# GarnBox
+# Yarn Box
 
 Eigenständiges Java-Projekt mit eigenem Git-Repository. Die übergeordneten
-Workspace-Regeln gelten ergänzend. BücherRegal bleibt unverändert.
+Workspace-Regeln gelten ergänzend. Andere Apps nur auf ausdrücklichen Auftrag ändern.
 
 ## Umfang und Architektur
 
@@ -22,6 +22,24 @@ deutsch. Eigene UI-Texte gehören in die app-lokalen UTF-8-Sprachkataloge.
 Fehler aus Anwendung und Persistenz verwenden stabile Codes, die UI übersetzt sie.
 Sprachwahl gilt ab Neustart und darf weder Textdaten noch Foto-BLOBs ändern.
 
+Öffentlicher Name in jeder Sprache: **Yarn Box**. Paket-ID, Datenpfade und
+Datenbankname bleiben unverändert. Neue Installationen starten unabhängig von
+der Systemsprache auf Englisch. Gespeicherte Sprachwahlen einschließlich
+ausdrücklich gewähltem „Automatisch“ bleiben erhalten. Die erste Store-
+Veröffentlichung verwendet deutsche Beschreibungen, Bildtexte und Release-
+Hinweise mit de-DE als primärer Store-Sprache. Diese Release-Sprache bestimmt
+nicht die App-Sprache. Alle sechs UI-Übersetzungen bleiben auswählbar.
+
+Eine Sammlung enthält höchstens 10.000 Einträge. Neuanlagen und ergänzende
+Importe müssen diese Grenze atomar einhalten. Identische bereits vorhandene
+Kopien dürfen auch bei voller Sammlung übersprungen werden. Vorhandene größere
+Altbestände bleiben erhalten, lesbar, bearbeitbar und löschbar. Keine Migration,
+automatische Kürzung oder Datenlöschung. Neue oder bearbeitete Textfelder sind
+auf 1.048.576 Zeichen begrenzt. Erfolgreiche JSON-Exporte müssen mit demselben
+Format wieder importierbar sein. Auch Exportgrenzen für Texte, Einträge, Fotos
+und 256 MiB Dateigröße vor Veröffentlichung der Zieldatei prüfen. Bei Überschreitung
+eine lokalisierte Erklärung anzeigen und temporäre Dateien entfernen.
+
 Internationalisierungs-Vorschauen gemäß `docs/internationalization.md` als
 Ordner liefern. Keine ZIP-Datei ohne ausdrücklichen Nutzerauftrag. Aufnahmen
 stammen aus der echten App mit synthetischen Daten auf einem eigenen Xvfb.
@@ -37,7 +55,7 @@ Aus diesem App-Verzeichnis mit vollständigem JDK 21:
 ./mvnw javafx:run
 ./scripts/run.sh
 ./scripts/package.sh app-image
-./target/app-image/GarnBox/bin/GarnBox
+"./target/app-image/Yarn Box/bin/Yarn Box"
 bash -n scripts/run.sh scripts/package.sh
 git diff --cached --check
 ```
@@ -60,7 +78,7 @@ Aus diesem App-Verzeichnis bei vorhandener X11-Desktop-Sitzung:
 ```bash
 systemd-run --user --collect --property=Type=exec \
   --setenv="DISPLAY=$DISPLAY" --setenv="XAUTHORITY=$XAUTHORITY" \
-  "$PWD/target/app-image/GarnBox/bin/GarnBox"
+  "$PWD/target/app-image/Yarn Box/bin/Yarn Box"
 ```
 
 Den zurückgegebenen Unit-Namen für `systemctl --user status` und

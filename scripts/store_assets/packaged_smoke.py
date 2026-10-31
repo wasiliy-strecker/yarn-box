@@ -2,6 +2,8 @@
 """Exercise the actual Linux jpackage launcher with isolated synthetic data and native input."""
 
 import argparse
+from io import BytesIO
+from PIL import Image
 import hashlib
 import json
 import os
@@ -31,8 +33,8 @@ def main():
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    package = ROOT / "target/app-image/GarnBox"
-    launcher = package / "bin/GarnBox"
+    package = ROOT / "target/app-image/Yarn Box"
+    launcher = package / "bin/Yarn Box"
     hashes = file_hashes(package)
     sources = source_hashes()
     xvfb = os.environ.get("YARNBOX_XVFB") or shutil.which("Xvfb")
@@ -186,7 +188,7 @@ def main():
                         stdout=log,
                         stderr=log,
                     )
-                win = window("GarnBox")
+                win = window("Yarn Box")
                 xdo("windowmove", "--sync", win, 0, 0)
                 xdo("windowfocus", "--sync", win)
                 time.sleep(1.5)
@@ -232,25 +234,30 @@ def main():
             shot("02-native-photo-import.png")
             xdo("windowfocus", "--sync", editor)
             key("ctrl+s")
-            expected_photo = source.read_bytes()
+            original_photo = source.read_bytes()
             deadline = time.monotonic() + 10
             while True:
                 with sqlite3.connect(database) as db:
                     saved = db.execute(
                         "SELECT name, photo FROM yarns WHERE id=1"
                     ).fetchone()
-                if saved == ("Écheveau café – ação", expected_photo):
+                if saved[0] == "Écheveau café – ação" and saved[1] is not None:
                     break
                 if time.monotonic() > deadline:
                     raise AssertionError(
                         "Packaged UI did not save Unicode text and replacement photo"
                     )
                 time.sleep(0.2)
+            with Image.open(BytesIO(saved[1])) as stored_image, Image.open(source) as original_image:
+                assert stored_image.format == "JPEG"
+                assert stored_image.size == original_image.size
+                stored_image.verify()
+            assert source.read_bytes() == original_photo
             checks.append(
                 "Native file picker imports JPEG and the real UI atomically saves Unicode and photo bytes"
             )
             source.unlink()
-            click(main_window, 880, 750)
+            click(main_window, 800, 744)
             dialog = window("Langue")
             click(dialog, 190, 160)
             key("Home", "Down", "Down", "Return")

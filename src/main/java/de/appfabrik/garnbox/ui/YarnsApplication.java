@@ -24,14 +24,14 @@ public final class YarnsApplication extends Application {
   private Path directory;
   private LanguagePreferences preferences;
   private PhotoDirectoryPreferences photoDirectories;
-  private String choice = AppLanguage.AUTOMATIC;
+  private String choice = AppLanguage.ENGLISH.tag();
   private boolean languageReadFailed;
   private boolean invalidDirectory;
 
   @Override
   public void init() {
     Locale systemLocale = Locale.getDefault();
-    messages = new Messages(AppLanguage.detect(systemLocale));
+    messages = new Messages(AppLanguage.ENGLISH);
     try {
       String configured = getParameters().getNamed().get("data-dir");
       if (configured != null && configured.isBlank()) {
@@ -60,7 +60,7 @@ public final class YarnsApplication extends Application {
               Alert.AlertType.ERROR,
               messages.text("start.error"),
               new ButtonType(messages.text("action.close")));
-      alert.setTitle("GarnBox");
+      alert.setTitle("Yarn Box");
       alert.setHeaderText(messages.text("start.title"));
       UiSupport.style(alert.getDialogPane().getScene());
       UiSupport.icon((Stage) alert.getDialogPane().getScene().getWindow());

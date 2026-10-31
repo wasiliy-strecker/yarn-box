@@ -10,8 +10,8 @@ import sys
 import tempfile
 
 APP_ID = "de.appfabrik.garnbox"
-APP_NAME = "GarnBox"
-LAUNCHER = "GarnBox"
+APP_NAME = "Yarn Box"
+LAUNCHER = "Yarn Box"
 WINDOW_CLASS = "de.appfabrik.garnbox.ui.YarnsApplication"
 MARKER = "X-AppFabrik-Managed=true"
 

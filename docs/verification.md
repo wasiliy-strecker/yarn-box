@@ -1,5 +1,44 @@
 # Prüfbericht
 
+## Korrekturen nach Release-Prüfung, 31. Oktober 2026
+
+Die gemeldeten Sicherungsfehler, veralteten Tests, der schlecht lesbare Farbcode
+und die Sprach- und Namensvorgaben sind korrigiert. Öffentlicher Name ist
+**Yarn Box**. Neue Installationen starten auf Englisch, auch bei deutschem
+Betriebssystem. Gespeicherte Sprachwahlen bleiben erhalten. Die erste Store-
+Veröffentlichung verwendet deutsche Texte und de-DE als primäre Store-Sprache.
+Diese Festlegung ändert weder Paket-ID noch Datenpfade.
+
+Neuanlagen und ergänzende Importe begrenzen die Sammlung atomar auf 10.000
+Einträge. Identische Kopien können bei voller Sammlung übersprungen werden.
+Größere Altbestände bleiben erhalten, lesbar, bearbeitbar und löschbar. Neue
+oder bearbeitete Textfelder sind auf 1.048.576 Zeichen begrenzt. Der Export
+prüft Einträge, Texte, Fotobytes und die tatsächliche UTF-8-Dateigröße bis
+256 MiB vor Veröffentlichung. Ein Fehler hinterlässt keine Teilsicherung und
+überschreibt keine vorhandene Datei. Die UI erklärt überschrittene Grenzen.
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| `./mvnw --batch-mode --no-transfer-progress spotless:apply verify dependency:build-classpath -Dmdep.outputFile=target/gui-classpath.txt` mit Temurin 21.0.13+9 | 92 Tests ohne Fehler oder ausgelassene Fälle. Compiler-Lint, Enforcer, Spotless und SpotBugs bestanden |
+| Sammlungstransfer | 10.000 Einträge und maximale Textlänge wiederhergestellt. Gleichzeitige Neuanlagen, Import-Rollback, Kopienanzahl, Altbestände, exakte UTF-8-Dateigrenze und Erhalt vorhandener Exportdateien geprüft |
+| Fotos | Optimierung, Transparenz, alle acht EXIF-Ausrichtungen, unveränderte Originale und bytegenauer Wiederimport geprüft |
+| Isolierte GUI in sechs Sprachen | 18 Prozesse mit 444 Prüfbedingungen bestanden. Farbwähler, Speicherung, Fehlerbehandlung, Sprachwechsel und Neustart geprüft |
+| Englischer Erststart | Drei Prüfbedingungen bei simulierter deutscher Systemsprache und fehlender Spracheinstellung bestanden |
+| Lokales Linux-App-Image | Neu gebaut. Echter Launcher mit gebündeltem Java bei `PATH=/nonexistent`, native Fotoauswahl, Unicode-Speicherung und englischer Neustart nach Entfernung der Bildquelle bestanden |
+| Sichtprüfung und Skriptsyntax | Dunkler Farbcode auf ausgewählter Zeile sowie englischer Name kontrolliert. Shell-/Python-Syntax und `git diff --check` bestanden |
+
+Nachweise: `target/release-fixes-verify.log`, `target/release-fixes-gui`,
+`target/release-fixes-startup`, `target/release-fixes-package.log` und
+`target/release-fixes-packaged-2`. Alle Testdaten sind synthetisch und isoliert.
+Der Ubuntu-Anwendungseintrag startet das neue App-Image unter
+`target/app-image/Yarn Box`. Bereits laufende Nutzerfenster und gespeicherte
+Sammlungen wurden nicht verändert. Frühere Lieferordner bleiben erhalten.
+
+Die nachfolgenden Abschnitte dokumentieren ältere Stände. Die jetzt ausgeführten
+Prüfungen decken auch die zuvor ungeprüften Fotoänderungen ab. Native Windows-
+und macOS-Abnahme, Signierung und Store-Auslieferung bleiben separate Schritte.
+Kein Push, Upload oder Store-Release in diesem Auftrag.
+
 ## Schaltfläche zum Neuladen entfernt, 31. Oktober 2026
 
 Die Fußleiste enthält nur noch Info, Sprache, Exportieren und Importieren.
