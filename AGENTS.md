@@ -142,3 +142,32 @@ die CSS-Klasse `danger` und einen roten Fokusrahmen.
 
 Microsoft Store: MSIX. Kostenloser GitHub-Download: EXE. Identitäten, Signierung,
 Windows-Abnahme und Veröffentlichung bleiben separate Release-Schritte.
+
+## Mac-App-Store-Vorbereitung 1.0
+
+Der Store-Eintrag verwendet `de.appfabrik.garnbox`, Version 1.0, Build 1.
+`packaging/macos` und `scripts/macos_release.py` gehören ausschließlich dieser
+App. Der Universal-Launcher und der JNI-Fotodialog müssen auf macOS kompiliert
+und signiert werden. Der Store-Launcher liefert den geprüften Containerpfad
+über `yarnbox.sandboxDataDirectory` und aktiviert `yarnbox.macAppStore`.
+Im Store-Build ist `--data-dir` gesperrt. Normale Installationen behalten ihre
+Pfade und JavaFX-Dateiauswahl. Sammlung und JSON-Schema unverändert erhalten.
+
+Der Export fordert im Store den Zielordner und danach den Dateinamen an, damit
+auch die temporäre Exportdatei berechtigt ist. Vorhandene Dateien bleiben erhalten.
+NSOpenPanel verwendet den gespeicherten Fotoordner als Navigationshinweis ohne
+Java-Dateisystemprüfung vor der Auswahl. Jeder neue Zugriff entsteht durch die
+aktive Dateiauswahl. Die App benötigt keine dauerhaften Rechte auf Originalfotos.
+
+Für diese Vorbereitung hat der Nutzer automatisierte Tests ausgeschlossen.
+`scripts/macos_release.py static-check` führt Compiler, Enforcer, Spotless und
+SpotBugs mit `-Dmaven.test.skip=true` aus. `capture_mac_drafts.py` ist ausschließlich
+Asset-Erstellung mit isolierten erfundenen Daten. Die native manuelle Abnahme
+steht in `docs/mac-app-store-release.md` und darf nicht als erledigt markiert
+werden, bevor sie auf dem Mac durchgeführt wurde. Keine Testfreigabe aus
+Bildentwürfen, Signaturprüfung oder Linux-Bau ableiten.
+
+Übergabeordner nie überschreiben. Nur versionierte Quellen übernehmen, keine
+persönlichen Exporte oder privaten Signierungsdateien. Erste Store-Metadaten
+nur auf Deutsch. Feldtexte enthalten nur kopierbare Inhalte. Keine ZIP-Dateien,
+kein Push, Upload oder Veröffentlichung ohne Nutzerauftrag.

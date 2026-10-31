@@ -1,0 +1,15 @@
+Mit Yarn Box behältst du deinen Garnvorrat im Überblick. Halte fest, welche Garne du besitzt, wie sie aussehen und wo sie aufbewahrt sind. Für den ersten Eintrag genügt eine Bezeichnung.
+
+Deine Sammlung an einem Ort
+Ergänze Marke, Aufbewahrungsort und persönliche Notizen. Suche nach Bezeichnung, Marke, Farbe, Ort oder Notiz und finde das passende Garn für deine nächste Idee.
+
+Farben und Fotos
+Wähle eine Farbe mit dem Farbwähler. Ein Farbfeld in der Liste macht deine Auswahl sichtbar. Ein optionales Foto pro Garn hilft dir beim Wiedererkennen. Neue JPEG- und PNG-Fotos werden platzsparend als Kopie gespeichert. Deine Originalbilder bleiben unverändert. Die Fotoauswahl merkt sich den zuletzt verwendeten Ordner.
+
+Sichern und mitnehmen
+Exportiere deine gesamte Sammlung als JSON-Datei einschließlich Farbwerten und gespeicherten Fotos. Beim Import bleiben vorhandene Einträge erhalten. Bereits enthaltene identische Kopien werden übersprungen. Die Sicherung speicherst und verwaltest du selbst.
+
+Lokal und ohne Konto
+Yarn Box funktioniert ohne Anmeldung und ohne Internetverbindung. Deine Sammlung wird auf deinem Mac gespeichert. Es gibt keine Werbung, kein Tracking und keine eigene Cloud-Synchronisierung. Die App verschlüsselt lokale Daten und exportierte Dateien nicht selbst.
+
+Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch verfügbar. Beim ersten Start ist Englisch eingestellt. Unter „Language“ kannst du Deutsch auswählen und die App neu starten.

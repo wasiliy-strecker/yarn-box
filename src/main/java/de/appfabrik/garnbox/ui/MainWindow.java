@@ -449,14 +449,21 @@ final class MainWindow {
     if (busy || !ready || loadFailed || (editor != null && editor.isShowing())) {
       return;
     }
-    FileChooser chooser = new FileChooser();
-    chooser.setTitle(messages.text("export.title"));
-    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
-    chooser.setInitialFileName(
+    String suggestedName =
         "yarn-box-"
             + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
-            + ".json");
-    File selected = chooser.showSaveDialog(stage);
+            + ".json";
+    File selected;
+    if (Boolean.getBoolean("yarnbox.macAppStore")) {
+      var path = SandboxExportDialog.choose(stage, messages, suggestedName);
+      selected = path == null ? null : path.toFile();
+    } else {
+      FileChooser chooser = new FileChooser();
+      chooser.setTitle(messages.text("export.title"));
+      chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
+      chooser.setInitialFileName(suggestedName);
+      selected = chooser.showSaveDialog(stage);
+    }
     if (selected == null) {
       return;
     }

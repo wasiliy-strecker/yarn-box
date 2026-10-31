@@ -248,3 +248,20 @@ Mit `--data-dir=/absoluter/pfad` kann der Eintrag eine bereits verwendete eigene
 Sammlung öffnen. Ohne diese Option gelten die normalen Datenpfade der App.
 Beim Verschieben des App-Images den Installer vom neuen Speicherort erneut
 aufrufen. Einen geöffneten Prozess anschließend regulär neu starten.
+
+## Mac App Store 1.0
+
+Die deutsche Erstveröffentlichung von Yarn Box wird mit Bundle-ID
+`de.appfabrik.garnbox`, Version 1.0, Build 1, für Apple Silicon und Intel vorbereitet.
+Die app-lokalen Helfer, Store-Felder und Anleitungen stehen unter
+[Mac-Abschluss](docs/mac-app-store-release.md) und
+[App-Store-Connect-Felder](docs/mac-app-store-fields.md).
+Die Bildentwürfe entstehen mit synthetischen Daten. Automatisierte Tests werden
+für diese Vorbereitung auf Nutzerwunsch nicht ausgeführt. Native Mac-Abnahme,
+Signierung, endgültige Bilder und Veröffentlichung bleiben gesonderte Schritte.
+
+Store-Installationen speichern im geschützten App-Container unter
+`~/Library/Containers/de.appfabrik.garnbox/Data/Library/Application Support/GarnBox`.
+Dort liegen `garnbox.db`, `language.txt` und `photo-directory.txt`.
+Bestehende normale Installationen behalten ihre bisherigen Datenpfade.
+Originalbilder und externe JSON-Sicherungen werden nicht automatisch verändert.

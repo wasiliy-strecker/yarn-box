@@ -25,6 +25,11 @@ public final class PhotoDirectoryPreferences {
     pictures = findPicturesDirectory();
   }
 
+  /** Navigation hint for NSOpenPanel. The native panel authorizes each selection. */
+  public Path lastDirectoryHint() {
+    return lastDirectory;
+  }
+
   public Path initialDirectory() {
     Path saved = lastDirectory;
     if (usable(saved)) {

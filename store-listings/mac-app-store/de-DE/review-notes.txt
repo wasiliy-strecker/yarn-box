@@ -1,0 +1,9 @@
+Yarn Box ist eine lokale Garnverwaltung für macOS. Es sind kein Konto, keine Anmeldung und kein Demo-Zugang erforderlich. Bitte „Anmeldung erforderlich“ deaktivieren.
+
+Zum Einstieg über „Add yarn“ einen Eintrag anlegen. Nur die Bezeichnung ist erforderlich. Optional Marke, Farbe, Aufbewahrungsort, Notiz und ein JPEG- oder PNG-Foto ergänzen. Die Farbe erscheint als Farbfeld in der Sammlung. Neue Fotos werden als optimierte Kopie gespeichert. Die Originaldateien bleiben erhalten.
+
+Die App startet auf Englisch. Unter „Language“ Deutsch wählen und die App neu starten, um die deutsche Oberfläche zu verwenden.
+
+Exportieren sichert sämtliche Einträge und gespeicherten Fotos als JSON. Im Mac-Store-Build zuerst den Zielordner wählen, danach den Dateinamen eingeben. Eine bestehende Datei wird nicht überschrieben. Importieren ergänzt die Sammlung und überspringt bereits enthaltene identische Kopien.
+
+Die Sammlung liegt lokal im App-Container. Die App benötigt keine Internetverbindung und enthält keine Werbung, Analytics oder In-App-Käufe. Die Datenschutzerklärung ist offline unter Info verfügbar.

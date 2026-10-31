@@ -221,30 +221,43 @@ final class YarnEditor {
     if (busy) {
       return;
     }
-    FileChooser chooser = new FileChooser();
-    chooser.setTitle(messages.text("photo.chooserTitle"));
-    var initialDirectory = photoDirectories.initialDirectory();
-    if (initialDirectory != null) {
-      chooser.setInitialDirectory(initialDirectory.toFile());
-    }
-    chooser
-        .getExtensionFilters()
-        .add(
-            new FileChooser.ExtensionFilter(
-                messages.text("photo.filter"),
-                "*.jpg",
-                "*.jpeg",
-                "*.png",
-                "*.JPG",
-                "*.JPEG",
-                "*.PNG"));
     File selected;
     try {
-      selected = chooser.showOpenDialog(stage);
-    } catch (IllegalArgumentException unavailableDirectory) {
-      // A removable directory can disappear between validation and the native dialog.
-      chooser.setInitialDirectory(null);
-      selected = chooser.showOpenDialog(stage);
+      if (Boolean.getBoolean("yarnbox.macAppStore")) {
+        selected =
+            MacPhotoPicker.choose(
+                messages.text("photo.chooserTitle"), photoDirectories.lastDirectoryHint());
+      } else {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle(messages.text("photo.chooserTitle"));
+        var initialDirectory = photoDirectories.initialDirectory();
+        if (initialDirectory != null) {
+          chooser.setInitialDirectory(initialDirectory.toFile());
+        }
+        chooser
+            .getExtensionFilters()
+            .add(
+                new FileChooser.ExtensionFilter(
+                    messages.text("photo.filter"),
+                    "*.jpg",
+                    "*.jpeg",
+                    "*.png",
+                    "*.JPG",
+                    "*.JPEG",
+                    "*.PNG"));
+        try {
+          selected = chooser.showOpenDialog(stage);
+        } catch (IllegalArgumentException unavailableDirectory) {
+          // A removable directory can disappear between validation and the native dialog.
+          chooser.setInitialDirectory(null);
+          selected = chooser.showOpenDialog(stage);
+        }
+      }
+    } catch (RuntimeException | LinkageError failure) {
+      showError(
+          new de.appfabrik.garnbox.application.PhotoException(
+              de.appfabrik.garnbox.application.PhotoException.Code.READ, failure));
+      return;
     }
     if (selected == null) {
       return;

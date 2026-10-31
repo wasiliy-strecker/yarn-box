@@ -8,8 +8,19 @@ public final class AppDataDirectory {
   private AppDataDirectory() {}
 
   public static Path current() {
+    if (Boolean.getBoolean("yarnbox.macAppStore")) {
+      return sandboxDirectory(System.getProperty("yarnbox.sandboxDataDirectory"));
+    }
     return resolve(
         System.getProperty("os.name"), Path.of(System.getProperty("user.home")), System.getenv());
+  }
+
+  static Path sandboxDirectory(String configured) {
+    if (configured == null || configured.isBlank() || !Path.of(configured).isAbsolute()) {
+      throw new IllegalArgumentException(
+          "The native Store launcher must supply its container directory");
+    }
+    return Path.of(configured);
   }
 
   static Path resolve(String os, Path home, Map<String, String> environment) {

@@ -1,0 +1,74 @@
+{
+  "temurin": "21.0.13+9",
+  "javafx": "21.0.11",
+  "files": [
+    {
+      "file": "OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.13_9.tar.gz",
+      "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.13_9.tar.gz",
+      "sha256": "bf036b35b071bfb2f54f2c0af8ee8d88afa95ee6eb3dce02c0f94cfc2524d04a",
+      "kind": "jdk",
+      "architecture": "arm64"
+    },
+    {
+      "file": "javafx-base-21.0.11-mac-aarch64.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.11/javafx-base-21.0.11-mac-aarch64.jar",
+      "sha256": "3b3ca2989063c5277257fa4619ff2a4ee70a374a386624d32bcde4076b8fd849",
+      "upstreamSha1": "bff054e3cb484c16d56e29399c531ee44c39cafa",
+      "kind": "javafx",
+      "module": "base",
+      "architecture": "arm64"
+    },
+    {
+      "file": "javafx-graphics-21.0.11-mac-aarch64.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.11/javafx-graphics-21.0.11-mac-aarch64.jar",
+      "sha256": "7b8c25508074849b129c5b028d92636a65264c59d610a843182ab90ac931b022",
+      "upstreamSha1": "afd43fe3e122c7994fbcfd6fd4388eae7c84fd41",
+      "kind": "javafx",
+      "module": "graphics",
+      "architecture": "arm64"
+    },
+    {
+      "file": "javafx-controls-21.0.11-mac-aarch64.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.11/javafx-controls-21.0.11-mac-aarch64.jar",
+      "sha256": "143b60eefdbd8d0f370467c89248a60a48e4b35428d16c5f9b59c9e543121c85",
+      "upstreamSha1": "9b21798363dee34a4953626a2a3408b1abbeeadb",
+      "kind": "javafx",
+      "module": "controls",
+      "architecture": "arm64"
+    },
+    {
+      "file": "OpenJDK21U-jdk_x64_mac_hotspot_21.0.13_9.tar.gz",
+      "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_mac_hotspot_21.0.13_9.tar.gz",
+      "sha256": "9aa1d1c17ae5467a022679e7e0af5c00797d94ac462ed1a46f4db07a8a34a6dd",
+      "kind": "jdk",
+      "architecture": "x86_64"
+    },
+    {
+      "file": "javafx-base-21.0.11-mac.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-base/21.0.11/javafx-base-21.0.11-mac.jar",
+      "sha256": "0f1bae8522f8db2323452f19c8c60a48c13254cfa8380949abec04709c5b4000",
+      "upstreamSha1": "340a043068d62256898ae98c7c5e8c907842c2cc",
+      "kind": "javafx",
+      "module": "base",
+      "architecture": "x86_64"
+    },
+    {
+      "file": "javafx-graphics-21.0.11-mac.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-graphics/21.0.11/javafx-graphics-21.0.11-mac.jar",
+      "sha256": "d73aa370c57feb58aae051a8db8b434dbbb209b91aff2c67c13c6bdf9ca55cf8",
+      "upstreamSha1": "2791d9b9f2a3aff176b8fd55825999fd56c5451b",
+      "kind": "javafx",
+      "module": "graphics",
+      "architecture": "x86_64"
+    },
+    {
+      "file": "javafx-controls-21.0.11-mac.jar",
+      "url": "https://repo.maven.apache.org/maven2/org/openjfx/javafx-controls/21.0.11/javafx-controls-21.0.11-mac.jar",
+      "sha256": "c2d93e96624291c00f3878497a827dcd7c6cd8e55b50da19c6488766ce334fda",
+      "upstreamSha1": "5507cec823d3a4505facd431cdb726a177736810",
+      "kind": "javafx",
+      "module": "controls",
+      "architecture": "x86_64"
+    }
+  ]
+}

@@ -34,7 +34,8 @@ public final class YarnsApplication extends Application {
     messages = new Messages(AppLanguage.ENGLISH);
     try {
       String configured = getParameters().getNamed().get("data-dir");
-      if (configured != null && configured.isBlank()) {
+      if (configured != null
+          && (configured.isBlank() || Boolean.getBoolean("yarnbox.macAppStore"))) {
         throw new IllegalArgumentException("Empty data directory");
       }
       directory = configured == null ? AppDataDirectory.current() : Path.of(configured);

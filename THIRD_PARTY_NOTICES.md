@@ -66,3 +66,16 @@ Lizenz, fester Quellstand und SHA-256 stehen unter
 `third-party-licenses/noto-sans-cjk/`. Die Lizenz liegt außerdem bei den
 Schriftressourcen im App-JAR. Pakethelfer übernehmen die Hinweise nach
 `legal/noto-sans-cjk/`. Die Schrift wird nicht systemweit installiert.
+
+## Mac App Store
+
+Der Mac-Helfer übernimmt die gepinnten Originalarchive und trennt die nativen
+JavaFX- und SQLite-Bibliotheken nach Architektur vom Java-Klassenpfad, damit
+sämtlicher nativer Code signiert werden kann. Dies ist eine Änderung der
+Paketstruktur. Java-Klassen und native Binärinhalte werden nicht verändert.
+Die oben genannte unveränderte JAR-Verpackung beschreibt die normalen App-Images.
+Die Mac-App enthält beide jlink-Laufzeiten samt ihren Lizenzhinweisen.
+`packaging/macos/dependencies.json` hält die Originaldateien und SHA-256 fest.
+`packaging/runtime-sources.json` beschreibt die mitzuliefernden Quellarchive.
+Öffentliche Bereitstellung und Inventur des endgültigen Mac-Pakets bleiben vor
+der Einreichung erforderlich. Die native Ausführung ist unter Linux nicht geprüft.

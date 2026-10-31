@@ -1,0 +1,1 @@
+Behalte deinen Garnvorrat im Blick. Erfasse Garne mit Foto, Farbe und Aufbewahrungsort. Sichere deine Sammlung samt Bildern als JSON. Alles bleibt lokal auf deinem Mac.

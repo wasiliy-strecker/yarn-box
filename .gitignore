@@ -12,3 +12,9 @@ __pycache__/
 *.pyc
 
 build/
+
+# Private Apple signing configuration and certificates
+packaging/macos/*.local.json
+*.p12
+*.pfx
+*.provisionprofile

@@ -1,0 +1,3 @@
+Erste Version von Yarn Box für macOS.
+
+Verwalte deinen Garnvorrat mit Bezeichnung, Marke, Farbe, Aufbewahrungsort, Notiz und einem optionalen Foto. Finde Einträge mit der Suche und sichere deine gesamte Sammlung einschließlich Bildern als JSON. Alle Daten werden lokal gespeichert.

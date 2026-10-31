@@ -10,6 +10,9 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
 cd "$ROOT"
-./mvnw --batch-mode --no-transfer-progress test-compile
-"$JAVA_HOME/bin/java" -cp target/classes:target/test-classes \
+./mvnw --batch-mode --no-transfer-progress compile -Dmaven.test.skip=true
+mkdir -p target/privacy-export
+"$JAVA_HOME/bin/javac" -cp target/classes -d target/privacy-export \
+  src/test/java/de/appfabrik/garnbox/i18n/PrivacyTextExport.java
+"$JAVA_HOME/bin/java" -cp target/classes:target/privacy-export \
   de.appfabrik.garnbox.i18n.PrivacyTextExport "$1"
