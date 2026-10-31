@@ -63,6 +63,15 @@ JPEG und PNG werden anhand des Bildinhalts geprüft. Erlaubt sind maximal
 10 MiB (10.485.760 Bytes), 6000 Pixel je Seite und 16 Millionen Pixel insgesamt.
 Ein zu großes oder ungültiges Foto verändert den bisherigen Entwurf nicht.
 
+Neu ausgewählte oder ersetzte Fotos werden vor dem Speichern automatisch auf
+höchstens 1600 Pixel an der längsten Seite verkleinert. Das Seitenverhältnis
+bleibt erhalten. Kleine Bilder werden nicht vergrößert. Bilder ohne Transparenz
+werden als JPEG mit Qualität 85 % gespeichert, transparente Bilder als PNG.
+Die EXIF-Ausrichtung wird berücksichtigt, Metadaten der Quelldatei werden nicht
+übernommen. Die Originaldatei wird nicht geändert. Bereits gespeicherte Fotos
+und Bilder aus JSON-Sicherungen bleiben unverändert. Auch das Bearbeiten einer
+Notiz komprimiert das gespeicherte Foto nicht erneut.
+
 Die Fotoauswahl merkt sich ab der nächsten bestätigten Dateiauswahl den
 zuletzt verwendeten Ordner für alle Einträge, auch nach einem App-Neustart.
 Abbrechen der Dateiauswahl behält den bisherigen Ordner bei. Ist der gemerkte
@@ -88,7 +97,7 @@ bewahrt. Für einen weiteren Export einen neuen Dateinamen wählen.
 Gewählte Farben stehen im Feld `color` als `#RRGGBB`, bei Transparenz als
 `#RRGGBBAA`. Eine fehlende Farbe ist eine leere Zeichenfolge. Frühere
 Farbbeschreibungen bleiben als ursprünglicher Text erhalten. Das Format heißt
-`yarn-box.collection`, Version 1. `photoBase64` enthält die Originalbildbytes
+`yarn-box.collection`, Version 1. `photoBase64` enthält die gespeicherten Bildbytes
 als Base64 oder `null`, wenn kein Foto vorhanden ist. Der Export wird lokal
 erst nach vollständigem Schreiben veröffentlicht. Die Datei ist unverschlüsselt.
 

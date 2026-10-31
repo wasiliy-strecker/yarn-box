@@ -1,5 +1,49 @@
 # Prüfbericht
 
+## Neue Fotos automatisch verkleinern, 31. Oktober 2026
+
+Die Dateiauswahl speichert neue oder ersetzte Fotos mit höchstens 1600 Pixeln
+an der längsten Seite. Seitenverhältnis und EXIF-Ausrichtung bleiben erhalten.
+Kleine Bilder werden nicht vergrößert. Bilder ohne transparente Pixel werden
+als JPEG mit Qualität 0,85 gespeichert, transparente Bilder als PNG.
+Quellmetadaten werden nicht übernommen. Die Originaldateien bleiben erhalten.
+Datenbanklesen und JSON-Import validieren weiterhin ohne erneute Codierung.
+Der Export enthält die gespeicherte Kopie als Base64. Keine Datenmigration.
+
+Auf ausdrücklichen Nutzerwunsch keine Tests, kein `verify`, keine automatisierte
+GUI-Prüfung und keine Bildschirmaufnahmen. Formatter, Compiler-Lint, Enforcer,
+Paketbau und statische SpotBugs-Analyse bestanden mit:
+
+```bash
+./mvnw --no-transfer-progress spotless:apply package spotbugs:check -Dmaven.test.skip=true
+```
+
+Protokoll: `target/photo-optimization-build.log`. Die statische Analyse meldete
+zunächst bereits vorhandene Pfad- und Injektionshinweise im Fotoordner- und
+Sammlungstransfercode. Der Datenordner wird nun direkt vorgehalten, die
+Exportpfade werden über geprüfte lokale Variablen verwendet. Für bewusst
+geteilte Transfer-Ports gilt dieselbe dokumentierte Konstruktor-Ausnahme wie
+für `YarnService`. Der erneute Lauf meldete keine Warnungen oder Fehler.
+Das vorhandene Linux-App-Image erhielt das neue JAR und wurde für die eigene
+Abnahme über den Benutzer-Service-Manager geöffnet.
+
+Manuelle Abnahme durch den Nutzer, noch nicht ausgeführt:
+
+- Ein Foto über 1600 Pixel innerhalb der Eingabegrenzen hinzufügen, speichern
+  und exportieren. Die aus `photoBase64` decodierte Kopie darf an keiner Seite
+  größer als 1600 Pixel sein und muss die Proportionen bewahren.
+- Ein kleines Bild auswählen. Seine Pixelmaße dürfen nicht wachsen.
+- Ein transparentes PNG auswählen. Die gespeicherte Kopie muss PNG mit
+  Transparenz bleiben. Ein opakes PNG soll als JPEG gespeichert werden.
+- Handyfotos mit EXIF-Drehung und Spiegelung auswählen. Vorschau und exportierte
+  Kopie sollen ohne EXIF-Daten die richtige Ausrichtung zeigen.
+- Originaldateien vergleichen. Inhalt und Pixelmaße dürfen sich nicht ändern.
+- Bei einem vorhandenen Foto nur den Text bearbeiten. Die gespeicherten
+  Fotobytes müssen gleich bleiben. Alte und neue Exporte wiederholt importieren.
+  Es darf keine erneute Fotokomprimierung oder zusätzliche identische Kopie geben.
+- Fehlerhafte oder zu große Dateien auswählen und einen Fotoentwurf abbrechen.
+  Der vorhandene gespeicherte Eintrag muss erhalten bleiben.
+
 ## Sammlung importieren, 31. Oktober 2026
 
 Eine sichtbare Schaltfläche „Importieren“ neben „Exportieren“ ergänzt.

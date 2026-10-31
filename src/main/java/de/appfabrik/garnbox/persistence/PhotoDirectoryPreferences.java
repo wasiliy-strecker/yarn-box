@@ -12,13 +12,15 @@ import java.util.Locale;
 /** Remembers only the photo directory, separately from collection contents and exports. */
 public final class PhotoDirectoryPreferences {
   private static final int MAX_BYTES = 16_384;
+  private final Path directory;
   private final Path file;
   private final Path home = Path.of(System.getProperty("user.home"));
   private final Path pictures;
   private volatile Path lastDirectory;
 
   public PhotoDirectoryPreferences(Path dataDirectory) {
-    file = dataDirectory.toAbsolutePath().normalize().resolve("photo-directory.txt");
+    directory = dataDirectory.toAbsolutePath().normalize();
+    file = directory.resolve("photo-directory.txt");
     lastDirectory = readSavedDirectory();
     pictures = findPicturesDirectory();
   }
@@ -49,8 +51,8 @@ public final class PhotoDirectoryPreferences {
     lastDirectory = selectedDirectory;
     Path temporary = null;
     try {
-      Files.createDirectories(file.getParent());
-      temporary = Files.createTempFile(file.getParent(), "photo-directory-", ".tmp");
+      Files.createDirectories(directory);
+      temporary = Files.createTempFile(directory, "photo-directory-", ".tmp");
       Files.writeString(temporary, selectedDirectory.toString(), StandardCharsets.UTF_8);
       try {
         Files.move(

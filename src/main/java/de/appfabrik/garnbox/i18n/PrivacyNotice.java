@@ -11,6 +11,8 @@ public final class PrivacyNotice {
         + "\n\n"
         + messages.text("privacy.body")
         + "\n\n"
+        + messages.text("privacy.photoOptimization")
+        + "\n\n"
         + messages.text("privacy.export")
         + "\n\n"
         + messages.text("privacy.import")

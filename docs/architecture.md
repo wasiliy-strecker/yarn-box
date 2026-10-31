@@ -96,10 +96,21 @@ oder sichere physische Datenlöschung versprochen.
    Die Grenzen sind 6000 Pixel je Seite und 16 Millionen Pixel insgesamt.
    Anschließend wird das Bild vollständig decodiert. Decoderfehler und Warnungen
    führen zur Ablehnung. Die Dateiendung ist nur ein Filter der Dateiauswahl.
-4. Die JavaFX-Vorschau wird ebenfalls im Hintergrund decodiert und verkleinert.
+4. Nur bei der Dateiauswahl erzeugt `PhotoOptimizer` aus dem decodierten Bild
+   eine Kopie mit höchstens 1600 Pixeln an der längsten Seite. Bicubische
+   Skalierung erhält die Proportionen und vergrößert kleine Bilder nicht.
+   `PhotoOrientation` liest das begrenzte EXIF-Orientierungsfeld aus JPEG-APP1
+   oder PNG-eXIf. Die acht Ausrichtungen einschließlich Spiegelungen werden
+   vor der Ausgabe auf die Pixel angewendet. Tatsächlich transparente Bilder
+   bleiben PNG, sonst wird JPEG mit Qualität 0,85 geschrieben. Die neue Datei
+   übernimmt keine Quellmetadaten. Fehler erhalten den bisherigen Entwurf.
+   Die JavaFX-Vorschau wird ebenfalls im Hintergrund decodiert und verkleinert.
    Erst wenn Import und Vorschau erfolgreich sind, ersetzen beide den bisherigen
-   Fotoentwurf. Die gespeicherten Originalbytes bleiben unverändert. Es gibt
-   keine Bildbearbeitung oder Galerie.
+   Fotoentwurf. Die Originaldatei bleibt unverändert. Es gibt keine Galerie.
+   `PhotoImporter.decode` validiert bestehende Datenbankfotos und JSON-Fotos,
+   ohne die Bytes neu zu codieren. Dadurch bleiben alte Sicherungen und die
+   bytebasierte Erkennung identischer Kopien erhalten. Optimiert wird weder
+   beim reinen Bearbeiten von Texten noch beim Export oder Wiederherstellen.
 5. Speichern erstellt einen `YarnDraft`. Dessen Konstruktor prüft eine nicht
    leere Bezeichnung, auch bei Unicode-Leerraum. Einzeilige Texte werden außen
    bereinigt, Zeilenumbrüche und Formatierung der Notiz bleiben erhalten.

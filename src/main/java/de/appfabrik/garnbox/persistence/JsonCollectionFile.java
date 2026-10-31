@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
 
-/** Versioned UTF-8 JSON, including selected colors and original photo bytes. */
+/** Versioned UTF-8 JSON, including selected colors and exact stored photo bytes. */
 public final class JsonCollectionFile implements CollectionFile {
   private static final long MAX_IMPORT_BYTES = 256L * 1024 * 1024;
   private static final int MAX_ENTRIES = 10_000;
@@ -196,14 +196,17 @@ public final class JsonCollectionFile implements CollectionFile {
   @Override
   public void write(Path target, Iterable<YarnDraft> yarns) throws IOException {
     Path destination = target.toAbsolutePath().normalize();
-    if (destination.getParent() == null
-        || !destination.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json")) {
+    Path parent = destination.getParent();
+    Path filename = destination.getFileName();
+    if (parent == null
+        || filename == null
+        || !filename.toString().toLowerCase(Locale.ROOT).endsWith(".json")) {
       throw new IOException("Choose a JSON file in an existing directory");
     }
     if (Files.exists(destination, LinkOption.NOFOLLOW_LINKS)) {
       throw new FileAlreadyExistsException(destination.toString());
     }
-    Path temporary = Files.createTempFile(destination.getParent(), ".yarn-box-", ".json.tmp");
+    Path temporary = Files.createTempFile(parent, ".yarn-box-", ".json.tmp");
     try {
       try (var writer = Files.newBufferedWriter(temporary, StandardCharsets.UTF_8)) {
         writer.write(

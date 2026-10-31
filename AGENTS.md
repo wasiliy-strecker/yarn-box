@@ -91,6 +91,15 @@ Grenzen: 10 MiB, 6000 Pixel je Seite, 16 Millionen Pixel. Datenbank und Bildlade
 bleiben außerhalb des JavaFX-Threads. Texte und BLOB werden gemeinsam atomar
 geändert. Keine Originaldatei verändern oder löschen.
 
+Neu ausgewählte oder ersetzte Fotos werden auf höchstens 1600 Pixel an der
+längsten Seite begrenzt, ohne kleine Bilder zu vergrößern. Seitenverhältnis
+und EXIF-Ausrichtung erhalten. Bilder ohne transparente Pixel als JPEG mit
+Qualität 0,85 speichern, transparente Bilder als PNG. Quellmetadaten nicht
+übernehmen. Nur die Dateiauswahl optimiert. Datenbanklesen und JSON-Import
+müssen die geprüften Bildbytes unverändert erhalten, damit Wiederherstellung
+und Erkennung identischer Kopien stabil bleiben. Keine automatische Migration
+bestehender Fotos.
+
 Ein Dialog schließt erst nach erfolgreichem Speichern. Alle Abbruchwege schützen
 Text- und Fotoänderungen. Fehler erhalten den Entwurf. Vorschau-Callbacks dürfen
 keine inzwischen gewechselte Auswahl überschreiben.

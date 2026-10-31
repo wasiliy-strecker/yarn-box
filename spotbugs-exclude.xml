@@ -7,4 +7,11 @@
     <Method name="&lt;init&gt;"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
+  <!-- Collection transfer services intentionally share their injected storage
+       and file ports, just as YarnService shares its repository. -->
+  <Match>
+    <Class name="~de\.appfabrik\.garnbox\.application\.Collection(Export|Import)"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
 </FindBugsFilter>
