@@ -39,6 +39,28 @@ git diff --cached --check
 JDK unter `$HOME/.local/share/garnbox/jdk-21.0.13+9`. Für direkte Wrapper-Aufrufe `JAVA_HOME` und `PATH`
 entsprechend setzen. Auf Windows `mvnw.cmd` verwenden.
 
+### App aus einer Agentensitzung öffnen
+
+Unter Ubuntu die vorhandene App unabhängig vom kurzlebigen Tool-Prozess über
+den Benutzer-Service-Manager starten. Ein direkter `gtk-launch`-Aufruf aus einem
+abgeschlossenen Tool-Befehl ließ das Fenster am 31. Oktober 2026 wieder
+verschwinden. Vor einem neuen Start nach einem vorhandenen Fenster mit der
+Klasse `de.appfabrik.garnbox.ui.YarnsApplication` suchen und es gegebenenfalls
+nur aktivieren. Keine zweite Instanz derselben Sammlung starten.
+
+Aus diesem App-Verzeichnis bei vorhandener X11-Desktop-Sitzung:
+
+```bash
+systemd-run --user --collect --property=Type=exec \
+  --setenv="DISPLAY=$DISPLAY" --setenv="XAUTHORITY=$XAUTHORITY" \
+  "$PWD/target/app-image/GarnBox/bin/GarnBox"
+```
+
+Den zurückgegebenen Unit-Namen für `systemctl --user status` und
+`journalctl --user -u` verwenden. Erst in einem späteren Tool-Aufruf prüfen,
+ob Prozess und Fenster weiterhin bestehen. Ein unmittelbar sichtbares Fenster
+allein belegt keinen dauerhaften Start. Dafür ist kein Neubau erforderlich.
+
 Vorbereitete native Wege, hier noch nicht ausgeführt:
 
 ```powershell

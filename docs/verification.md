@@ -1,5 +1,28 @@
 # Prüfbericht
 
+## Dauerhafter Start aus der Agentensitzung, 31. Oktober 2026
+
+Yarn Box wurde über den bisherigen `gtk-launch`-Aufruf kurz sichtbar und
+verschwand nach Abschluss des Tool-Befehls. Die Gegenprobe verwendete dieselbe
+unveränderte Paketdatei, einen temporären Desktop-Eintrag und eine separate
+Testsammlung unter `/tmp/yarn-box-start-check-xbhqwuhn`. Während des Befehls
+bestand das zusätzliche Fenster. Im folgenden Tool-Aufruf war es verschwunden.
+Die mit `strace` aufgezeichneten Prozesse und die Ausgabe lieferten keine
+Java-Fehlermeldung. Das konkrete Beendigungssignal wurde nicht aufgezeichnet.
+
+Der Start über `systemd-run --user` blieb dagegen über mehrere abgeschlossene
+Tool-Aufrufe hinweg aktiv. Der Benutzer-Service-Manager ist der Elternprozess,
+die App hat eine eigene Prozessgruppe. Prozess, sichtbares Hauptfenster und
+Service-Status wurden wiederholt kontrolliert. Das Journal enthält nur den
+erfolgreichen Start und keine App-Fehlermeldung. Die normale Sammlung ist mit
+diesem Startweg geöffnet und bleibt für den Nutzer verfügbar.
+
+Die Korrektur betrifft den Start durch den Agenten. `AGENTS.md` dokumentiert
+den dauerhaften Startweg und die nachgelagerte Kontrolle. Anwendungscode,
+Paketdateien und Desktop-Registrierung wurden nicht geändert. Keine Daten
+migriert oder gelöscht. Keine Kompilierung oder automatisierte Tests für diese
+Dokumentationsänderung. Inhalt, Shell-Beispiele und Diff wurden kontrolliert.
+
 ## App-Icons auf den drei Desktop-Plattformen, 31. Oktober 2026
 
 Vorhandene Motive in zusätzliche Fenstergrößen, Windows-ICO und macOS-ICNS
