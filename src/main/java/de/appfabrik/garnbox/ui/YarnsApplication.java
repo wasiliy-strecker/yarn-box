@@ -7,6 +7,7 @@ import de.appfabrik.garnbox.i18n.Messages;
 import de.appfabrik.garnbox.persistence.AppDataDirectory;
 import de.appfabrik.garnbox.persistence.JsonCollectionFile;
 import de.appfabrik.garnbox.persistence.LanguagePreferences;
+import de.appfabrik.garnbox.persistence.PhotoDirectoryPreferences;
 import de.appfabrik.garnbox.persistence.SqliteYarnRepository;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,6 +22,7 @@ public final class YarnsApplication extends Application {
   private Messages messages;
   private Path directory;
   private LanguagePreferences preferences;
+  private PhotoDirectoryPreferences photoDirectories;
   private String choice = AppLanguage.AUTOMATIC;
   private boolean languageReadFailed;
   private boolean invalidDirectory;
@@ -36,6 +38,7 @@ public final class YarnsApplication extends Application {
       }
       directory = configured == null ? AppDataDirectory.current() : Path.of(configured);
       preferences = new LanguagePreferences(directory);
+      photoDirectories = new PhotoDirectoryPreferences(directory);
       try {
         choice = preferences.load();
       } catch (IOException exception) {
@@ -68,7 +71,15 @@ public final class YarnsApplication extends Application {
     YarnService service = new YarnService(repository);
     var exports = new CollectionExport(repository, new JsonCollectionFile());
     new MainWindow(
-            stage, service, exports, tasks, messages, preferences, choice, languageReadFailed)
+            stage,
+            service,
+            exports,
+            tasks,
+            messages,
+            preferences,
+            photoDirectories,
+            choice,
+            languageReadFailed)
         .show();
   }
 

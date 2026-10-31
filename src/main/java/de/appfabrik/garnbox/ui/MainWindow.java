@@ -4,6 +4,7 @@ import de.appfabrik.garnbox.application.CollectionExport;
 import de.appfabrik.garnbox.application.YarnService;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.i18n.Messages;
+import de.appfabrik.garnbox.persistence.PhotoDirectoryPreferences;
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
 import java.time.LocalDateTime;
@@ -47,6 +48,7 @@ final class MainWindow {
   private final YarnService service;
   private final CollectionExport exports;
   private final AsyncTasks tasks;
+  private final PhotoDirectoryPreferences photoDirectories;
   private final TableView<Yarn> table = new TableView<>();
   private final TextField search = new TextField();
   private final Label count = new Label();
@@ -77,10 +79,12 @@ final class MainWindow {
       AsyncTasks tasks,
       Messages messages,
       de.appfabrik.garnbox.persistence.LanguagePreferences preferences,
+      PhotoDirectoryPreferences photoDirectories,
       String languageChoice,
       boolean languageReadFailed) {
     this.messages = messages;
     this.preferences = preferences;
+    this.photoDirectories = photoDirectories;
     this.languageChoice = languageChoice;
     this.languageReadFailed = languageReadFailed;
     preview = new PhotoPreview(240, 180, messages);
@@ -409,7 +413,8 @@ final class MainWindow {
                             : messages.text("stored"),
                         false);
                   },
-                  messages);
+                  messages,
+                  photoDirectories);
           editor.show();
         },
         failure -> {

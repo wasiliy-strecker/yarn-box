@@ -1,5 +1,28 @@
 # Prüfbericht
 
+## Zuletzt gewählter Bilderordner, 31. Oktober 2026
+
+Die Fotoauswahl verwendet eine appweit geteilte, lokal gespeicherte
+Ordnereinstellung. Nach einer bestätigten Dateiauswahl wird der übergeordnete
+Ordner im Hintergrund gespeichert. Auch eine später abgelehnte Bilddatei
+ändert diese reine Navigationseinstellung. Abbrechen der Dateiauswahl ändert
+sie nicht. Fehlende oder unlesbare Ordner führen zum Bilder- beziehungsweise
+Benutzerordner. Die Einstellung ist durch `--data-dir` von anderen Sammlungen
+isoliert. Ein Schreibfehler verhindert den Fotoimport nicht und wird gemeldet.
+
+Auf ausdrücklichen Nutzerwunsch keine Tests, kein `verify` und keine
+automatisierte GUI-Prüfung. Nur Formatter und Paketbau mit
+`./mvnw --no-transfer-progress spotless:apply package -Dmaven.test.skip=true`.
+Protokoll: `target/photo-directory-build.log`.
+
+Manuelle Abnahme durch den Nutzer: Ein Foto aus einem anderen Ordner wählen
+und danach erneut die Fotoauswahl öffnen, auch bei einem anderen Eintrag.
+Die App neu starten und den wieder vorgeschlagenen Ordner kontrollieren.
+In einen weiteren Ordner navigieren und die Dateiauswahl abbrechen. Beim
+nächsten Öffnen muss der zuvor bestätigte Ordner erhalten sein. Den zuletzt
+gewählten Ordner testweise verschieben oder einen externen Datenträger trennen
+und den Rückfall auf einen verfügbaren Standardordner prüfen.
+
 ## Farbwähler und JSON-Export, 31. Oktober 2026
 
 Auf ausdrücklichen Nutzerwunsch keine Tests, kein `verify`, keine automatisierte

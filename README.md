@@ -63,6 +63,15 @@ JPEG und PNG werden anhand des Bildinhalts geprüft. Erlaubt sind maximal
 10 MiB (10.485.760 Bytes), 6000 Pixel je Seite und 16 Millionen Pixel insgesamt.
 Ein zu großes oder ungültiges Foto verändert den bisherigen Entwurf nicht.
 
+Die Fotoauswahl merkt sich ab der nächsten bestätigten Dateiauswahl den
+zuletzt verwendeten Ordner für alle Einträge, auch nach einem App-Neustart.
+Abbrechen der Dateiauswahl behält den bisherigen Ordner bei. Ist der gemerkte
+Ordner nicht erreichbar, beginnt die Auswahl im Bilderordner oder, falls auch
+dieser fehlt, im Benutzerordner. Unter Linux wird der konfigurierte
+XDG-Bilderordner berücksichtigt. Die Einstellung liegt in `photo-directory.txt`
+im App-Datenordner und gehört nicht zum Sammlungsexport. Das Abbrechen eines
+Garnentwurfs setzt diese allgemeine Ordnereinstellung nicht zurück.
+
 Abbrechen der Dateiauswahl verändert nichts. Abbrechen des Eingabedialogs,
 Escape und Fensterschließen fragen bei ungespeicherten Änderungen nach.
 Nach Speicherfehlern bleiben Texte und gewählte Vorschau zum erneuten Speichern

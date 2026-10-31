@@ -6,6 +6,7 @@ import de.appfabrik.garnbox.domain.Photo;
 import de.appfabrik.garnbox.domain.Yarn;
 import de.appfabrik.garnbox.domain.YarnDraft;
 import de.appfabrik.garnbox.i18n.Messages;
+import de.appfabrik.garnbox.persistence.PhotoDirectoryPreferences;
 import java.io.File;
 import java.util.function.Consumer;
 import javafx.application.Platform;
@@ -48,6 +49,7 @@ final class YarnEditor {
   private final PhotoPreview preview;
   private final YarnService service;
   private final AsyncTasks tasks;
+  private final PhotoDirectoryPreferences photoDirectories;
   private final Long id;
   private final Input original;
   private final Consumer<Yarn> onSaved;
@@ -61,7 +63,8 @@ final class YarnEditor {
       YarnService service,
       AsyncTasks tasks,
       Consumer<Yarn> onSaved,
-      Messages messages) {
+      Messages messages,
+      PhotoDirectoryPreferences photoDirectories) {
     this.messages = messages;
     color = new YarnColorField(existing == null ? "" : existing.color(), messages);
     preview = new PhotoPreview(232, 170, messages);
@@ -72,6 +75,7 @@ final class YarnEditor {
     remove.setText(messages.text("photo.remove"));
     this.service = service;
     this.tasks = tasks;
+    this.photoDirectories = photoDirectories;
     this.onSaved = onSaved;
     id = existing == null ? null : existing.id();
     photo = existingPhoto;
@@ -219,6 +223,10 @@ final class YarnEditor {
     }
     FileChooser chooser = new FileChooser();
     chooser.setTitle(messages.text("photo.chooserTitle"));
+    var initialDirectory = photoDirectories.initialDirectory();
+    if (initialDirectory != null) {
+      chooser.setInitialDirectory(initialDirectory.toFile());
+    }
     chooser
         .getExtensionFilters()
         .add(
@@ -230,21 +238,34 @@ final class YarnEditor {
                 "*.JPG",
                 "*.JPEG",
                 "*.PNG"));
-    File selected = chooser.showOpenDialog(stage);
+    File selected;
+    try {
+      selected = chooser.showOpenDialog(stage);
+    } catch (IllegalArgumentException unavailableDirectory) {
+      // A removable directory can disappear between validation and the native dialog.
+      chooser.setInitialDirectory(null);
+      selected = chooser.showOpenDialog(stage);
+    }
     if (selected == null) {
       return;
     }
     setBusy(true, messages.text("photo.checking"));
     error.setVisible(false);
+    var selectedPath = selected.toPath();
     tasks.submit(
         () -> {
-          Photo imported = PhotoImporter.read(selected.toPath());
-          return new ImportedPhoto(imported, PhotoPreview.decode(imported));
+          boolean directorySaved = photoDirectories.remember(selectedPath);
+          Photo imported = PhotoImporter.read(selectedPath);
+          return new ImportedPhoto(imported, PhotoPreview.decode(imported), directorySaved);
         },
         imported -> {
           photo = imported.photo();
           preview.showImage(imported.image());
           setBusy(false, "");
+          if (!imported.directorySaved()) {
+            error.setText(messages.text("photo.directoryNotSaved"));
+            error.setVisible(true);
+          }
         },
         failure -> {
           setBusy(false, "");
@@ -331,5 +352,5 @@ final class YarnEditor {
   private record Input(
       String name, String brand, String color, String location, String note, Photo photo) {}
 
-  private record ImportedPhoto(Photo photo, Image image) {}
+  private record ImportedPhoto(Photo photo, Image image, boolean directorySaved) {}
 }
