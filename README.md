@@ -151,3 +151,23 @@ geprüfte Linux-Oberfläche und das startbare Paket. Native Windows- und macOS-
 Abnahmen sowie Store-Schritte sind offen. Es wurde nichts veröffentlicht.
 
 Hinweise zu Fremdkomponenten: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## App-Icon und Ubuntu-Anwendungsmenü
+
+Die App enthält ihr eigenes Icon für Fenster und Dialoge. Windows-Pakete verwenden
+ICO, macOS-Pakete ICNS. Ubuntu ordnet das laufende Fenster über einen passenden
+Anwendungseintrag demselben Icon zu.
+
+Nach dem Linux-App-Image-Bau aus diesem App-Verzeichnis registrieren:
+
+```bash
+python3 target/app-image/GarnBox/install_desktop.py
+```
+
+Danach lässt sich die App über ihren Namen in der Ubuntu-Anwendungsübersicht
+starten und bei Bedarf vom Nutzer im Dock anheften. Der Installer benötigt
+Python 3, keine Administratorrechte und verändert keine Sammlung.
+Mit `--data-dir=/absoluter/pfad` kann der Eintrag eine bereits verwendete eigene
+Sammlung öffnen. Ohne diese Option gelten die normalen Datenpfade der App.
+Beim Verschieben des App-Images den Installer vom neuen Speicherort erneut
+aufrufen. Einen geöffneten Prozess anschließend regulär neu starten.

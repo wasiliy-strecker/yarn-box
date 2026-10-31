@@ -59,6 +59,7 @@ try {
         if (Test-Path $Staging) { Remove-Item $Staging -Recurse -Force }
         & "$env:JAVA_HOME\bin\jpackage.exe" --type exe --name GarnBox `
             --app-image $AppImage --app-version $Version --vendor "Wasiliy Strecker" `
+            --icon "$Root\assets\branding\icon.ico" `
             --dest $Staging --win-per-user-install --win-menu --win-shortcut `
             --win-menu-group "GarnBox" --win-upgrade-uuid "18ae9414-4e23-48f8-bc2e-376a9bc8957c"
         if ($LASTEXITCODE -ne 0) { throw "EXE-Paket fehlgeschlagen. Für JDK 21 wird WiX 3 benötigt." }
