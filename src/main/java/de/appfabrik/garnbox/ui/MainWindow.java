@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -28,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 final class MainWindow {
+  private final EventHandler<InputEvent> editorInputBlocker = event -> event.consume();
   private final Messages messages;
   private final Stage stage;
   private final YarnService service;
@@ -322,11 +325,11 @@ final class MainWindow {
     if (!ready || busy || loadFailed || (editor != null && editor.isShowing())) {
       return;
     }
-    setBusy(true);
+    setEditorOpening(true);
     tasks.submit(
         () -> yarn == null ? null : service.photo(yarn.id()),
         photo -> {
-          setBusy(false);
+          setEditorOpening(false);
           editor =
               new YarnEditor(
                   stage,
@@ -348,9 +351,19 @@ final class MainWindow {
           editor.show();
         },
         failure -> {
-          setBusy(false);
+          setEditorOpening(false);
           showStatus(UiSupport.message(failure, messages), true);
         });
+  }
+
+  private void setEditorOpening(boolean value) {
+    busy = value;
+    // Block duplicate actions without flashing the list's disabled appearance.
+    if (value) {
+      stage.getScene().addEventFilter(InputEvent.ANY, editorInputBlocker);
+    } else {
+      stage.getScene().removeEventFilter(InputEvent.ANY, editorInputBlocker);
+    }
   }
 
   private void editSelected() {
