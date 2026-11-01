@@ -164,7 +164,7 @@ separat. Die Dateiauswahl verwendet teilweise Beschriftungen des Betriebssystems
 
 ## Datenschutz und Fokusrahmen
 
-„Info“ öffnet die vollständige Datenschutzerklärung offline in der ausgewählten
+„Info“ → „Datenschutz“ öffnet die vollständige Datenschutzerklärung offline in der ausgewählten
 App-Sprache. Der Dialog ist scrollbar, schreibgeschützt und kopierbar.
 Escape oder „Schließen“ führen zurück. Er wird erst nach der Positionierung
 sichtbar, damit die anfängliche Korrektur der Fensterposition verborgen bleibt.
@@ -265,3 +265,14 @@ Store-Installationen speichern im geschützten App-Container unter
 Dort liegen `garnbox.db`, `language.txt` und `photo-directory.txt`.
 Bestehende normale Installationen behalten ihre bisherigen Datenpfade.
 Originalbilder und externe JSON-Sicherungen werden nicht automatisch verändert.
+
+## Informationen zur App
+
+Das Menü „Info“ bietet drei getrennte Fenster. „Über die App“ zeigt den
+Produktnamen, die gebaute Version, eine kurze Beschreibung und den Supportkontakt.
+„Datenschutz“ zeigt die vollständige Erklärung in der gewählten Sprache.
+„Lizenzen“ enthält die Hinweise und Originaltexte zu den Fremdkomponenten.
+Alle Inhalte sind offline verfügbar, kopierbar und schreibgeschützt.
+Überschriften und Erläuterungen sind in allen sechs Sprachen vorhanden.
+Rechtliche Originaltexte bleiben in ihrer Originalsprache. Weitere Hinweise
+der eingebetteten Java-Laufzeit bleiben in deren Lizenzordnern erhalten.

@@ -171,3 +171,11 @@ Bildentwürfen, Signaturprüfung oder Linux-Bau ableiten.
 persönlichen Exporte oder privaten Signierungsdateien. Erste Store-Metadaten
 nur auf Deutsch. Feldtexte enthalten nur kopierbare Inhalte. Keine ZIP-Dateien,
 kein Push, Upload oder Veröffentlichung ohne Nutzerauftrag.
+
+## Getrennte App-Informationen, 1. November 2026
+
+„Info“ enthält drei getrennte Einträge: Über die App, Datenschutz und Lizenzen.
+Alle eigenen Erläuterungen und Menütexte in den sechs vorhandenen Katalogen
+pflegen. Die vollständige Datenschutzerklärung bleibt identisch zum Textexport.
+Original-Lizenztexte unverändert einbetten. Neue Fremdkomponenten auch im
+app-lokalen Lizenzindex ergänzen. Versionsangaben stammen aus dem Maven-Build.

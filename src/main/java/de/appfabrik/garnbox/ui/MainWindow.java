@@ -24,7 +24,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -229,9 +228,7 @@ final class MainWindow {
     status.setMaxWidth(Double.MAX_VALUE);
     status.setMinWidth(0);
     HBox.setHgrow(status, Priority.ALWAYS);
-    MenuItem privacy = new MenuItem(messages.text("privacy.title"));
-    privacy.setOnAction(event -> new PrivacyDialog(stage, messages).show());
-    MenuButton info = new MenuButton(messages.text("info.title"), null, privacy);
+    MenuButton info = InfoMenu.create(stage, messages);
     info.setId("app-info");
     info.setMinWidth(Region.USE_PREF_SIZE);
     language.setMinWidth(Region.USE_PREF_SIZE);
