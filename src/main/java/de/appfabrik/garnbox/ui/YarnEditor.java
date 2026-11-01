@@ -55,6 +55,7 @@ final class YarnEditor {
   private final Consumer<Yarn> onSaved;
   private Photo photo;
   private boolean busy;
+  private final CloseRequests closeRequests = new CloseRequests(this::closeIfApproved);
 
   YarnEditor(
       Window owner,
@@ -348,10 +349,21 @@ final class YarnEditor {
   }
 
   void requestClose() {
-    if (busy) {
-      return;
+    requestClose(() -> {});
+  }
+
+  void requestClose(Runnable afterClose) {
+    if (!busy) {
+      closeRequests.request(afterClose);
     }
-    if (input().equals(original)
+  }
+
+  private boolean closeIfApproved() {
+    if (busy) {
+      return false;
+    }
+    if (!stage.isShowing()
+        || input().equals(original)
         || UiSupport.confirm(
             stage,
             messages.text("discard.title"),
@@ -359,7 +371,9 @@ final class YarnEditor {
             messages.text("action.discard"),
             messages.text("action.keep"))) {
       stage.hide();
+      return true;
     }
+    return false;
   }
 
   private record Input(

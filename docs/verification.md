@@ -1,5 +1,34 @@
 # Prüfbericht
 
+## Mac-Beenden, 1. November 2026
+
+Cmd+Q kann für Hauptfenster und Editor mehrere Schließanfragen auslösen.
+Diese werden vor der Rückfrage gebündelt. „Weiterbearbeiten“ erhält den gesamten
+Entwurf und verwirft auch den ausstehenden Beenden-Wunsch. „Verwerfen“ schließt
+Editor und Hauptfenster. Ein unveränderter Editor benötigt keine Rückfrage.
+Das alleinige Schließen des Editors lässt das Hauptfenster geöffnet. Laufendes
+Speichern wird nicht unterbrochen. Implementierung und Tests bleiben app-lokal.
+
+Der aktuelle Nutzerauftrag umfasst ausdrücklich die zuvor gefundenen Fehler.
+Die frühere Testzurückstellung einzelner Aufgaben gilt nicht für diese Korrektur.
+Mit Eclipse Temurin 21.0.13+9 auf einem eigenen Xvfb-/Openbox-Bildschirm ausgeführt:
+
+```bash
+./mvnw --batch-mode --no-transfer-progress spotless:apply verify -Dgarnbox.uiTests=true
+```
+
+98 Tests bestanden. Keine Fehler und keine übersprungenen Tests.
+Compiler-Lint, Enforcer, Spotless und SpotBugs bestanden. Protokoll:
+`target/mac-workflows-verify.log`. Sechs neue Beenden-Regressionen rufen den
+JavaFX-Glass-Handler auf, den macOS für Cmd+Q verwendet. Sie prüfen Verwerfen,
+Weiterbearbeiten, wiederholte Anfragen, unveränderte Entwürfe, das einzelne
+Editorfenster und einen gezielt verzögerten Speichervorgang.
+
+Manuelle Mac-Abnahme bleibt erforderlich: Cmd+Q mit offenem Entwurf abbrechen
+und bestätigen. Während eines Speichervorgangs erneut versuchen.
+Linux-Prüfungen sind keine native Mac- oder Sandbox-Abnahme. Keine Store-Pakete, Veröffentlichung oder Änderung
+persönlicher Sammlungen. Bereits laufende Benutzerprozesse wurden nicht beendet.
+
 ## Vollständiger Custom-Color-Dialog, 31. Oktober 2026
 
 Der native JavaFX-Farbdialog verwendet jetzt 50 × 34 em bevorzugte Inhaltsgröße,

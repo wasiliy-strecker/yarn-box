@@ -269,7 +269,7 @@ final class MainWindow {
             event.consume();
           } else if (editor != null && editor.isShowing()) {
             event.consume();
-            editor.requestClose();
+            editor.requestClose(stage::hide);
           }
         });
   }
