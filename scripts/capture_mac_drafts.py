@@ -9,10 +9,66 @@ import select
 import shutil
 import subprocess
 import tempfile
+from zipfile import ZipFile
 
 import macos_release as mac
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def existing_runtime():
+    """Read existing artifacts only. Never invoke Maven or build the application."""
+    app = ROOT / "target/app-image/Yarn Box/lib/app"
+    modules = ROOT / "target/javafx-modules"
+    jar = ROOT / "target/garnbox-1.0.jar"
+    dependencies = sorted(p for p in app.glob("*.jar") if not p.name.startswith("garnbox-"))
+    files = [jar] + dependencies + sorted(modules.glob("*.jar"))
+    if len(dependencies) != 3 or len(list(modules.glob("*.jar"))) != 3:
+        raise ValueError(
+            "The existing Yarn Box dependencies and JavaFX modules are required"
+        )
+    # The older app-image is only a dependency source. Use the verified current JAR.
+    compiled = ROOT / "target/classes"
+    if not jar.is_file() or not compiled.is_dir():
+        raise ValueError(
+            "The previously verified application JAR and classes are required"
+        )
+    with ZipFile(jar) as archive:
+        for path in compiled.rglob("*"):
+            if (
+                path.is_file()
+                and archive.read(path.relative_to(compiled).as_posix())
+                != path.read_bytes()
+            ):
+                raise ValueError(
+                    "The application JAR differs from the existing compiled output"
+                )
+        for path in (ROOT / "src/main/resources").rglob("*"):
+            if (
+                path.is_file()
+                and archive.read(
+                    path.relative_to(ROOT / "src/main/resources").as_posix()
+                )
+                != path.read_bytes()
+            ):
+                raise ValueError("The application JAR has outdated resources")
+    if any(
+        p.stat().st_mtime > jar.stat().st_mtime
+        for p in (ROOT / "src/main/java").rglob("*.java")
+    ):
+        raise ValueError(
+            "Application sources are newer than the existing JAR. No automatic build"
+        )
+    changed = subprocess.check_output(
+        ["git", "diff", "HEAD", "--name-only", "src/main", "pom.xml"],
+        cwd=ROOT,
+        text=True,
+    )
+    if changed.strip():
+        raise ValueError(
+            "App sources changed. This asset workflow does not rebuild them"
+        )
+    return {path.relative_to(ROOT).as_posix(): mac.sha256(path) for path in files}
 
 
 def main():
@@ -25,16 +81,22 @@ def main():
     if not xvfb:
         raise SystemExit("Set YARNBOX_XVFB to Xvfb, or install Xvfb")
     home = mac.java_home()
-    dependencies = (ROOT / "target/gui-classpath.txt").read_text().strip().split(os.pathsep)
-    javafx = [p for p in dependencies if "javafx-" in Path(p).name
-              and p.endswith(("-linux.jar", "-linux-aarch64.jar"))]
-    if len(javafx) != 3:
-        raise ValueError("Three native Linux JavaFX modules required")
-    classes = ROOT / "target/store-asset-classes"
-    classes.mkdir(parents=True, exist_ok=True)
-    classpath = os.pathsep.join([str(ROOT / "target/classes"), *dependencies])
-    mac.run(home / "bin/javac", "-encoding", "UTF-8", "-cp", classpath, "-d", classes,
-            ROOT / "scripts/store_assets/MacStoreDrafts.java")
+    runtime = existing_runtime()
+    javafx = [str(ROOT / path) for path in runtime if "javafx-modules/" in path]
+    classes = output / "helper-classes"
+    classes.mkdir()
+    classpath = os.pathsep.join(str(ROOT / path) for path in runtime
+                                if "javafx-modules/" not in path)
+    # Compile only the asset helper. It uses package-private production dialogs.
+    with (output / "compile-helper.log").open("w") as log:
+        subprocess.run([str(home / "bin/javac"), "-encoding", "UTF-8",
+                        "-cp", classpath + os.pathsep + os.pathsep.join(javafx),
+                        "-d", str(classes),
+                        str(ROOT / "scripts/store_assets/MacStoreDrafts.java")],
+                       cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
+                       timeout=60, check=True)
+    (output / "runtime-info.json").write_text(
+        json.dumps({"appBuildExecuted": False, "files": runtime}, indent=2) + "\n")
     digest = mac.source_digest()
     read_fd, write_fd = os.pipe()
     server = None
@@ -63,9 +125,13 @@ def main():
             with (output / "capture.log").open("w") as log:
                 subprocess.run(command, cwd=ROOT, env=env, stdout=log,
                                stderr=subprocess.STDOUT, timeout=150, check=True)
+        if runtime != existing_runtime():
+            raise ValueError("Application artifacts changed during capture")
         if mac.source_digest() != digest:
             raise ValueError("Sources changed during capture")
         manifest = {"platform": "Linux", "previewOnly": True, "testsExecuted": False,
+                    "appBuildExecuted": False,
+                    "runtimeInfoSha256": mac.sha256(output / "runtime-info.json"),
                     "viewport": [2560, 1600], "locale": "de-DE", "sourceDigest": digest,
                     "createdUtc": datetime.now(timezone.utc).isoformat(),
                     "method": "Production JavaFX views on isolated Xvfb with synthetic JSON data",

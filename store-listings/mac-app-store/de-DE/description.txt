@@ -10,6 +10,6 @@ Sichern und mitnehmen
 Exportiere deine gesamte Sammlung als JSON-Datei einschließlich Farbwerten und gespeicherten Fotos. Beim Import bleiben vorhandene Einträge erhalten. Bereits enthaltene identische Kopien werden übersprungen. Die Sicherung speicherst und verwaltest du selbst.
 
 Lokal und ohne Konto
-Yarn Box funktioniert ohne Anmeldung und ohne Internetverbindung. Deine Sammlung wird auf deinem Mac gespeichert. Es gibt keine Werbung, kein Tracking und keine eigene Cloud-Synchronisierung. Die App verschlüsselt lokale Daten und exportierte Dateien nicht selbst.
+Die Verwaltung deiner Garnsammlung funktioniert ohne Anmeldung und ohne Internetverbindung. Deine Sammlung wird auf deinem Mac gespeichert. Es gibt keine Werbung, kein Tracking und keine eigene Cloud-Synchronisierung. Die App verschlüsselt lokale Daten und exportierte Dateien nicht selbst. Die englische Datenschutzerklärung lässt sich über „Info“ im Browser auf GitHub öffnen. Dafür ist eine Internetverbindung erforderlich.
 
-Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch verfügbar. Beim ersten Start ist Englisch eingestellt. Unter „Language“ kannst du Deutsch auswählen und die App neu starten.
+Die Oberfläche ist auf Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch (Brasilien) verfügbar. Beim ersten Start ist Englisch eingestellt. Unter „Language“ kannst du Deutsch auswählen und die App neu starten.
