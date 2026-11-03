@@ -3,4 +3,4 @@ Una foto JPEG o PNG opcional por entrada
 Busca en los cinco campos de texto
 Almacenamiento local sin cuenta
 Seis idiomas de interfaz disponibles
-Leer la política de privacidad sin conexión dentro de la aplicación
+Abrir la política de privacidad en inglés en GitHub desde el navegador

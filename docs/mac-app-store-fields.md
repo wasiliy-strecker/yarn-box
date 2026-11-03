@@ -47,17 +47,20 @@ entsprechend den konkreten Fragen beantworten. Die Altersstufe berechnet Apple.
 
 ## App-Datenschutz
 
-Für den vorgesehenen unveränderten Offline-Build werden keine Daten aus der
-App an Entwickler oder Drittanbieter übertragen. Sammlung mit Fotos, Sprache und gemerkter Fotoordner liegen
-lokal. Es gibt weder Tracking noch Analytics oder Werbe-SDKs. Dafür ist in Apples
-Datenschutzfragebogen „Es werden keine Daten erfasst“ vorgesehen. Freiwillige
-Support-E-Mails werden separat in der Datenschutzerklärung erläutert.
+Für die lokale Anwendung ist weiterhin „Es werden keine Daten erfasst“ vorgesehen.
+Die App besitzt keine Konten, Werbung, Telemetrie oder eigene Cloud-Synchronisation.
+Der ausdrücklich angeforderte Browseraufruf überträgt keine Sammlung.
 
-Die vollständige Erklärung liegt unter `Privacy/de-DE.txt` und `Privacy/index.html`.
-Sie muss vor Einreichung öffentlich ohne Anmeldung erreichbar sein. Eine lokale
-Datei oder ein noch nicht gepushter Repository-Pfad ist keine funktionierende
-Datenschutz-URL. Eine allgemeine README ohne vollständige Erklärung reicht nicht.
-Die aktuelle Übergabe führt die öffentliche Datenschutzadresse als **offen**.
+Datenschutz-URL für alle Store-Sprachen:
+
+```text
+https://github.com/wasiliy-strecker/yarn-box/blob/main/PRIVACY.md
+```
+
+Die vollständige englische Erklärung steht in `PRIVACY.md`. Neue Übergaben
+enthalten eine unveränderte Kopie und `privacy-url.txt` unter `Privacy`.
+Vor der Einreichung die URL ohne Anmeldung öffnen und den App-Namen prüfen.
+Die optionale URL für Datenschutzoptionen bleibt leer.
 
 Händlerstatus, Inhaltsrechte und Vertragszustimmungen sind persönliche rechtliche
 Erklärungen. Diese Vorbereitung trifft oder ändert sie nicht automatisch.

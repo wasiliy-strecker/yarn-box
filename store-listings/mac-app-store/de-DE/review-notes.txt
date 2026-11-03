@@ -6,4 +6,4 @@ Die App startet auf Englisch. Unter „Language“ Deutsch wählen und die App n
 
 Exportieren sichert sämtliche Einträge und gespeicherten Fotos als JSON. Im Mac-Store-Build zuerst den Zielordner wählen, danach den Dateinamen eingeben. Eine bestehende Datei wird nicht überschrieben. Importieren ergänzt die Sammlung und überspringt bereits enthaltene identische Kopien.
 
-Die Sammlung liegt lokal im App-Container. Die App benötigt keine Internetverbindung und enthält keine Werbung, Analytics oder In-App-Käufe. Die Datenschutzerklärung ist offline unter Info verfügbar.
+Die Sammlung liegt lokal im App-Container. Die Sammlungsverwaltung benötigt keine Internetverbindung und enthält keine Werbung, Analytics oder In-App-Käufe. „Info“ → „Datenschutz“ öffnet die englische Erklärung auf GitHub im Standardbrowser. Dafür ist eine Internetverbindung erforderlich.

@@ -2,14 +2,13 @@
 """Assemble the German Yarn Box Mac handoff from committed sources, without tests."""
 import argparse
 from datetime import datetime, timezone
-import html
 import json
 from pathlib import Path
 import shutil
 import struct
 import subprocess
-import tempfile
 
+from export_privacy import export_privacy, privacy_url
 import macos_release as mac
 from runtime_sources import acquire_sources
 
@@ -54,23 +53,7 @@ def main():
     shutil.copytree(args.inputs.resolve(), output / "MacInputs")
     shutil.copytree(ROOT / "store-listings/mac-app-store/de-DE", output / "Store/de-DE")
     shutil.copytree(ROOT / "assets/branding", output / "Branding")
-    privacy = output / "Privacy"
-    privacy.mkdir()
-    with tempfile.TemporaryDirectory(prefix="yarnbox-privacy-") as temporary:
-        export = Path(temporary) / "export"
-        mac.run(ROOT / "scripts/export_privacy.sh", export)
-        policy = (export / "de-DE.txt").read_text()
-    (privacy / "de-DE.txt").write_text(policy)
-    rendered = ('<!doctype html><html lang="de"><meta charset="utf-8">'
-                '<meta name="viewport" content="width=device-width,initial-scale=1">'
-                '<title>Datenschutz – Yarn Box</title><style>'
-                'body{max-width:52rem;margin:3rem auto;padding:0 1rem;font:18px/1.6 system-ui}'
-                'p{white-space:pre-line}</style><main>')
-    rendered += "".join("<p>" + html.escape(part) + "</p>" for part in policy.split("\n\n"))
-    (privacy / "index.html").write_text(rendered + "</main></html>\n")
-    (privacy / "URL-NOCH-OFFEN.txt").write_text(
-        "Die vollständige Erklärung vor Einreichung öffentlich ohne Anmeldung bereitstellen.\n"
-        "Eine lokale Datei ist noch keine Datenschutz-URL. Kein Upload wurde ausgeführt.\n")
+    export_privacy(output / "Privacy")
     drafts = output / "Screenshot-Drafts-Linux/de-DE"
     drafts.mkdir(parents=True)
     for name in IMAGES:
@@ -101,7 +84,7 @@ def main():
               "sourceDigest": mac.source_digest(), "createdUtc": datetime.now(timezone.utc).isoformat(),
               "localPreparation": "complete", "staticChecks": "passed", "testsExecuted": False,
               "screenshots": "Linux drafts only", "macBuild": False, "macAcceptance": False,
-              "signing": False, "upload": False, "publicPrivacyURL": "pending",
+              "signing": False, "upload": False, "publicPrivacyURL": privacy_url(),
               "runtimeSourcePublication": "pending", "storeReady": False}
     (output / "preparation-info.json").write_text(json.dumps(report, indent=2) + "\n")
     (output / "ZUERST-LESEN.txt").write_text(
@@ -110,7 +93,7 @@ def main():
         "Danach: Den gesamten Ordner auf den Mac kopieren und AUF-DEM-MAC.md folgen.\n"
         "MacInputs enthält Bauinputs für ARM64 und Intel, noch keine fertige Mac-App.\n"
         "Screenshot-Drafts-Linux enthält Entwürfe. Finale Mac-Bilder fehlen.\n"
-        "Datenschutz und Laufzeitquellen sind vorbereitet, noch nicht veröffentlicht.\n"
+        "Privacy enthält die englische Erklärung und ihre GitHub-URL. Laufzeitquellen separat prüfen.\n"
         "Statische Prüfungen bestanden. Keine automatisierten Tests ausgeführt.\n"
         "Native Mac-Abnahme durch den Nutzer erforderlich. Kein Upload und kein Push.\n"
         "Es sind ausschließlich erfundene Beispielsammlungen enthalten.\n"
