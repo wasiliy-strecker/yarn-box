@@ -408,6 +408,9 @@ final class MainWindow {
                   saved -> {
                     yarns.removeIf(existing -> existing.id() == saved.id());
                     yarns.add(saved);
+                    if (yarn == null) {
+                      search.clear();
+                    }
                     refresh(saved.id());
                     showStatus(
                         YarnService.search(List.of(saved), search.getText()).isEmpty()
