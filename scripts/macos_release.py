@@ -10,6 +10,7 @@ from pathlib import Path
 import plistlib
 import re
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -225,6 +226,27 @@ def strip_native_jar(source, destination, native, architecture, sqlite=False):
         raise ValueError("Expected one pinned SQLite native library per architecture")
 
 
+def runtime_bundle_id(bundle_id, architecture):
+    return bundle_id + ".runtime." + architecture.replace("_", "-")
+
+
+def inspect_bundle_resources(app):
+    for path in [app, *app.rglob("*")]:
+        if path.is_symlink():
+            continue
+        required = stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH
+        if path.is_dir():
+            required |= stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+        if path.stat().st_mode & required != required:
+            raise ValueError("Bundle resource is not readable by all users: " + str(path))
+        if path.name == "Info.plist":
+            info = plistlib.loads(path.read_bytes())
+            identifier = info.get("CFBundleIdentifier")
+            if identifier is not None and (not isinstance(identifier, str)
+                    or not re.fullmatch(r"[A-Za-z0-9.-]+", identifier)):
+                raise ValueError("Invalid bundle identifier in " + str(path))
+
+
 def build(inputs, output):
     require_mac()
     check_inputs(inputs)
@@ -284,7 +306,7 @@ def build(inputs, output):
                         "--no-header-files", "--output", runtime)
                     if not (runtime / "lib/libjli.dylib").is_file():
                         raise ValueError("The pinned JDK does not match the native launcher layout")
-                    runtime_info = {"CFBundleIdentifier": release["bundleId"] + ".runtime." + arch,
+                    runtime_info = {"CFBundleIdentifier": runtime_bundle_id(release["bundleId"], arch),
                                     "CFBundleName": "Temurin Runtime " + arch,
                                     "CFBundleExecutable": "libjli.dylib",
                                     "CFBundlePackageType": "BNDL", "CFBundleVersion": release["build"]}
@@ -326,6 +348,7 @@ def is_macho(path):
 
 def inspect(app, signed=False):
     require_mac()
+    inspect_bundle_resources(app)
     release = settings()
     contents = app / "Contents"
     info = plistlib.loads((contents / "Info.plist").read_bytes())
@@ -340,6 +363,9 @@ def inspect(app, signed=False):
     for arch in ARCHITECTURES:
         native = contents / "Frameworks/Native" / arch
         runtime = contents / f"PlugIns/Runtime-{arch}.bundle/Contents/Home"
+        runtime_info = plistlib.loads((runtime.parent / "Info.plist").read_bytes())
+        if runtime_info.get("CFBundleIdentifier") != runtime_bundle_id(release["bundleId"], arch):
+            raise ValueError("Unexpected runtime bundle identity: " + arch)
         for required in (native / "libsqlitejdbc.dylib", native / "libglass.dylib", native / "libyarnboxdialogs.dylib",
                          runtime / "lib/libjli.dylib", runtime / "lib/server/libjvm.dylib",
                          runtime.parent / "MacOS/libjli.dylib"):
@@ -381,7 +407,10 @@ def signing_config(config, app):
     if (expiration <= datetime.now(timezone.utc) or value["teamId"] not in profile["TeamIdentifier"]
             or app_id != value["teamId"] + "." + release["bundleId"]):
         raise ValueError("Provisioning profile is expired or belongs to another app/team")
-    shutil.copy2(profile_path, app / "Contents/embedded.provisionprofile")
+    embedded = app / "Contents/embedded.provisionprofile"
+    shutil.copyfile(profile_path, embedded)
+    # Keep the source profile private; only its distributed copy must be readable.
+    embedded.chmod(0o644)
     return value, entitlements
 
 

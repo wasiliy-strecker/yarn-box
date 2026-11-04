@@ -167,3 +167,27 @@ python3 scripts/prepare_mac_handoff.py --inputs build/mac-inputs-neu --captures 
 [Apple: NSOpenPanel](https://developer.apple.com/documentation/appkit/nsopenpanel)
 
 [Apple: Screenshots](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/)
+
+## Korrekturen gegen Transporter 90255 und 90277, 4. November 2026
+
+Der Universal-Helfer übernimmt die beiden in Bookshelf behobenen Ursachen:
+
+- Die Intel-Runtime verwendet `de.appfabrik.garnbox.runtime.x86-64` als
+  `CFBundleIdentifier`. Ihr Ordner bleibt `Runtime-x86_64.bundle`, damit der
+  native Launcher die vorhandene Struktur weiterfindet. ARM64 bleibt separat.
+- Das Provisionierungsprofil wird ohne Übernahme privater Quelldateirechte
+  eingebettet und erhält ausschließlich in der App-Kopie den Modus `0644`.
+  Das heruntergeladene Original darf weiterhin `0600` behalten.
+- `inspect` kontrolliert zusätzlich Leserechte, durchsuchbare Verzeichnisse
+  und sämtliche vorhandenen Bundle-IDs. Die erwarteten Runtime-IDs werden
+  explizit abgeglichen. Signierung und Paketierung verwenden diese Prüfung.
+
+Gezielte Regressionen mit künstlichen Dateien und simuliertem Profil-Decoding:
+
+```bash
+python3 -B scripts/test_macos_release.py
+```
+
+Diese Prüfung baut und signiert keine App. Buildnummer, Versionsnummer,
+Store-Eintrag und Anwendungsdaten bleiben unverändert. Ein neuer nativer Build
+mit anschließender Paket-/Transporter-Prüfung ist ein späterer Release-Schritt.
